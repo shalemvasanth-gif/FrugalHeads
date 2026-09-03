@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The employee journey — Problems, Systems, AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080D0A; --panel:#0D1712; --ink:#FFFFFF; --muted:#8FA096; --rule:#1C2A23; --soft:#111C16;
+    --neon:#3BFF9E; --neon-dim:#0F2B1E;
+    --problem:#FF7A6B; --problem-tint:#1E110F;
+    --system:#FFFFFF; --system-tint:#141C18;
+    --ai:#3BFF9E;     --ai-tint:#0C1F16;
+    --warn:#FFC565;
+    --maxw:1240px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15.5px;line-height:1.55;
+    background-image:radial-gradient(900px 500px at 78% -8%, rgba(59,255,158,.09), transparent 60%);background-repeat:no-repeat}
+  a{color:inherit}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  :focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+  ::selection{background:var(--neon);color:#06120C}
+
+  /* Header */
+  .top{border-bottom:1px solid var(--rule);background:rgba(8,13,10,.92);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+  .top-in{max-width:var(--maxw);margin:0 auto;padding:12px 24px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .brand{font-weight:600;letter-spacing:.01em;margin-right:auto;display:flex;gap:10px;align-items:center}
+  .brand .mark{width:10px;height:22px;background:var(--neon);border-radius:2px;box-shadow:0 0 14px rgba(59,255,158,.6);flex:none}
+  .brand small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+  .lens{display:flex;border:1px solid var(--rule);border-radius:999px;padding:3px;gap:2px;background:var(--panel)}
+  .lens button{padding:6px 14px;border-radius:999px;color:var(--muted);font-weight:500;font-size:13.5px;display:flex;gap:7px;align-items:center}
+  .lens button .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .lens button[data-lens=problem]{color:var(--problem)}
+  .lens button[data-lens=system]{color:#DCE6E0}
+  .lens button[data-lens=ai]{color:var(--ai)}
+  .lens button[data-lens=all]{color:var(--ink)}
+  .lens button.on{background:var(--neon);color:#06120C}
+  .lens button.on .dot{background:#06120C}
+  .search{border:1px solid var(--rule);border-radius:999px;padding:7px 14px;font:inherit;font-size:13.5px;min-width:200px;background:var(--panel);color:var(--ink)}
+  .search::placeholder{color:#6C7B73}
+  .costf{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+  .costf button{border:1px solid var(--rule);border-radius:999px;padding:4px 10px;font-size:12.5px;background:var(--panel);color:var(--muted)}
+  .costf button.on{background:var(--neon-dim);border-color:var(--neon);color:var(--neon)}
+
+  /* Hero */
+  .hero{max-width:var(--maxw);margin:0 auto;padding:60px 24px 28px;display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:end}
+  .hero h1{font-size:clamp(34px,4.6vw,58px);line-height:1.02;letter-spacing:-.025em;font-weight:600;margin:0 0 20px}
+  .hero h1 .p{color:var(--problem)} .hero h1 .s{color:#FFFFFF} .hero h1 .a{color:var(--neon);text-shadow:0 0 26px rgba(59,255,158,.35)}
+  .hero p{max-width:62ch;margin:0 0 12px;font-size:17px;color:#D5DFD9}
+  .hero .aside{border-left:3px solid var(--neon);padding-left:18px;font-size:14.5px;color:var(--muted)}
+  .hero .aside b{color:var(--ink);display:block;margin-bottom:6px;font-weight:600}
+  .hero .aside ol{margin:0;padding-left:18px}
+  .hero .aside li{margin:4px 0}
+  .hero .aside li::marker{color:var(--neon)}
+
+  /* Promise */
+  .promise{max-width:var(--maxw);margin:0 auto;padding:8px 24px 40px}
+  .promise h2{font-size:14px;font-weight:600;margin:0 0 12px;color:var(--muted)}
+  .promise ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--neon);border-bottom:1px solid var(--rule)}
+  .promise li{padding:16px 16px 16px 0;border-right:1px solid var(--rule);font-size:14.5px;line-height:1.4;color:var(--muted)}
+  .promise li+li{padding-left:16px}
+  .promise li:last-child{border-right:0}
+  .promise li strong{display:block;font-size:23px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px;color:var(--ink)}
+
+  /* Layout */
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:230px 1fr;gap:40px;align-items:start}
+  .rail{position:sticky;top:76px}
+  .rail h2{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 10px}
+  .rail ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--rule)}
+  .rail li button{display:block;width:100%;text-align:left;padding:8px 0 8px 14px;margin-left:-2px;border-left:2px solid transparent;color:var(--muted);font-size:14px}
+  .rail li button b{display:block;color:#C9D5CE;font-weight:500}
+  .rail li button small{font-size:12px}
+  .rail li button.cur{border-left-color:var(--neon)}
+  .rail li button.cur b{font-weight:600;color:var(--neon)}
+  .rail .count{margin-top:18px;font-size:12.5px;color:var(--muted)}
+
+  section.stage{padding:8px 0 40px;scroll-margin-top:84px}
+  section.stage>header{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:baseline;border-bottom:2px solid var(--neon);padding-bottom:12px;margin-bottom:6px}
+  section.stage>header .n{font-size:42px;font-weight:600;letter-spacing:-.03em;line-height:1;color:var(--neon)}
+  section.stage>header h2{font-size:24px;margin:0 0 4px;font-weight:600;letter-spacing:-.015em}
+  section.stage>header p{margin:0;color:var(--muted);max-width:72ch}
+
+  /* Card */
+  .card{border-bottom:1px solid var(--rule);padding:22px 0 26px}
+  .card.hide{display:none}
+  .card-h{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:14px}
+  .card-h h3{font-size:19px;margin:0;font-weight:600;letter-spacing:-.01em}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+  .tag{font-size:11.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--rule);color:var(--muted);background:var(--panel)}
+  .tag.cost0{border-color:rgba(59,255,158,.45);color:var(--neon);background:var(--neon-dim)}
+  .tag.cost1{border-color:#2C3B33;color:#C9D5CE;background:#141F19}
+  .tag.cost2{border-color:rgba(255,197,101,.4);color:var(--warn);background:#1D1710}
+  .tri{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:26px}
+  .col h4{font-size:12.5px;font-weight:600;margin:0 0 10px;padding-bottom:6px;border-bottom:3px solid;display:flex;justify-content:space-between;align-items:center}
+  .col.pr h4{border-color:var(--problem);color:var(--problem)}
+  .col.sy h4{border-color:#E7EFE9;color:#E7EFE9}
+  .col.ai h4{border-color:var(--ai);color:var(--ai)}
+  .col p{margin:0 0 10px;font-size:14.5px;color:#CBD6D0}
+  .col ol,.col ul{margin:0;padding-left:18px;font-size:14.5px;color:#CBD6D0}
+  .col li{margin:0 0 6px}
+  .col.sy li::marker{color:#6E7D75}
+  .col.ai li::marker{color:var(--neon)}
+  .ex{margin-top:10px;padding:10px 12px;background:var(--problem-tint);border-left:2px solid var(--problem);border-radius:0 6px 6px 0;font-size:13.5px;color:#E4C4BE}
+  .ex b{display:block;font-weight:600;font-size:12px;color:var(--problem);margin-bottom:3px}
+  .meta{margin-top:10px;font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+  .meta span b{color:#E7EFE9;font-weight:500}
+  .none{font-size:13.5px;color:var(--muted);font-style:italic}
+  .stack{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .stack code{font-family:inherit;background:var(--ai-tint);padding:1px 6px;border-radius:4px;color:var(--neon)}
+
+  /* Lens dimming */
+  body[data-lens=problem] .col:not(.pr), body[data-lens=system] .col:not(.sy), body[data-lens=ai] .col:not(.ai){opacity:.18}
+  .col{transition:opacity .2s}
+
+  /* Rollout */
+  .rollout{max-width:var(--maxw);margin:0 auto;padding:0 24px 40px}
+  .rollout h2{font-size:24px;font-weight:600;letter-spacing:-.015em;margin:0 0 6px;border-bottom:2px solid var(--neon);padding-bottom:12px}
+  .rollout>p{color:var(--muted);max-width:72ch;margin:8px 0 22px}
+  .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .phase{border-top:3px solid var(--rule);padding-top:12px}
+  .phase.p1{border-color:#E7EFE9}.phase.p2{border-color:#1F8A57}.phase.p3{border-color:var(--neon)}
+  .phase h3{margin:0;font-size:17px;font-weight:600}
+  .phase .when{color:var(--muted);font-size:13px;margin:2px 0 10px}
+  .phase ul{margin:0;padding-left:0;list-style:none;font-size:14.5px}
+  .phase li{margin:0 0 7px}
+  .phase li label{cursor:pointer;display:flex;gap:9px;align-items:flex-start;color:#CBD6D0}
+  .phase li input{margin-top:5px;accent-color:var(--neon);flex:none}
+  .phase li input:checked+span{color:#5F6E66;text-decoration:line-through}
+  .measure{max-width:var(--maxw);margin:0 auto;padding:26px 24px 10px}
+  .measure h2{font-size:20px;font-weight:600;margin:0 0 12px}
+  .measure ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .measure li{border-top:1px solid var(--rule);padding-top:10px;font-size:13.5px;color:var(--muted)}
+  .measure li b{display:block;color:var(--neon);font-size:15px;font-weight:600;margin-bottom:3px}
+  .human{max-width:var(--maxw);margin:0 auto;padding:34px 24px 60px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+  .human h2{font-size:20px;font-weight:600;margin:0 0 10px}
+  .human ul{margin:0;padding-left:18px;font-size:14.5px;color:#CBD6D0}
+  .human li{margin-bottom:7px}
+  .human li::marker{color:var(--neon)}
+  .foot{border-top:1px solid var(--rule);color:var(--muted);font-size:12.5px;padding:18px 24px 40px;max-width:var(--maxw);margin:0 auto}
+
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr;gap:20px;padding-top:36px}
+    .promise ul{grid-template-columns:repeat(2,1fr)}
+    .promise li{border-right:0;border-bottom:1px solid var(--rule);padding-left:0!important}
+    .wrap{grid-template-columns:1fr;gap:16px}
+    .rail{position:sticky;top:60px;background:var(--bg);padding:8px 0;z-index:10;border-bottom:1px solid var(--rule)}
+    .rail h2,.rail .count{display:none}
+    .rail ol{display:flex;overflow-x:auto;border-left:0;gap:4px}
+    .rail li button{white-space:nowrap;border-left:0;border-bottom:2px solid transparent;padding:6px 10px;margin:0}
+    .rail li button.cur{border-bottom-color:var(--neon)}
+    .rail li button small{display:none}
+    .tri{grid-template-columns:1fr}
+    .phases,.human{grid-template-columns:1fr}
+    .measure ul{grid-template-columns:repeat(2,1fr)}
+    .top-in{gap:10px}
+  }
+  @media print{
+    body{background:#fff;color:#000}
+    .top,.rail,.costf,.search{display:none}
+    .wrap{grid-template-columns:1fr}
+    .col{opacity:1!important}
+    .card{break-inside:avoid}
+  }
+
+  /* Track switcher */
+  .top-in{padding-bottom:0}
+  .top-row2{max-width:var(--maxw);margin:0 auto;padding:0 24px 10px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .tracks{display:flex;gap:22px;align-items:flex-end}
+  .tracks button{padding:8px 0 10px;color:var(--muted);font-weight:500;font-size:14.5px;border-bottom:2px solid transparent;display:flex;gap:9px;align-items:baseline}
+  .tracks button i{font-style:normal;font-size:12px;color:#5F6E66}
+  .tracks button.on{color:var(--ink);border-bottom-color:var(--neon)}
+  .tracks button.on i{color:var(--neon)}
+  .top-in{align-items:flex-end}
+
+  /* Journey strip */
+  .journey{max-width:var(--maxw);margin:0 auto;padding:6px 24px 34px;display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:stretch}
+  .jcard{text-align:left;border:1px solid var(--rule);background:var(--panel);border-radius:10px;padding:18px 20px;display:block;transition:border-color .2s,background .2s}
+  .jcard{cursor:pointer}
+  .jcard:hover{border-color:#2B4438}
+  .jcard:focus-visible{outline:2px solid var(--neon);outline-offset:3px}
+  .jcard.on{border-color:var(--neon);background:linear-gradient(180deg,rgba(59,255,158,.07),rgba(59,255,158,0))}
+  .jcard h3{margin:0 0 4px;font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .jcard .range{color:var(--muted);font-size:13.5px;margin-bottom:12px}
+  .jcard .num{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1;color:var(--neon)}
+  .jcard .num span{font-size:13.5px;font-weight:400;color:var(--muted);letter-spacing:0;margin-left:7px}
+  .jcard p{margin:10px 0 0;font-size:13.5px;color:#AFBDB5;max-width:44ch}
+  .handoff{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;text-align:center;max-width:150px}
+  .handoff .line{width:1px;flex:1;background:linear-gradient(180deg,transparent,var(--neon),transparent);min-height:24px}
+  .handoff b{color:var(--neon);font-weight:500;display:block}
+
+  /* Track visibility */
+  body[data-track=ta] [data-trk=hr], body[data-track=hr] [data-trk=ta]{display:none}
+  .rail ol[data-trk]{display:block}
+  body[data-track=ta] .rail ol[data-trk=hr], body[data-track=hr] .rail ol[data-trk=ta]{display:none}
+
+  @media (max-width:980px){
+    .journey{grid-template-columns:1fr;gap:12px}
+    .handoff{flex-direction:row;max-width:none;gap:12px}
+    .handoff .line{height:1px;width:auto;flex:1;background:linear-gradient(90deg,transparent,var(--neon),transparent);min-height:0}
+    .tracks{gap:16px}
+    .top-row2{padding-bottom:6px}
+  }
+</style>
+</head>
+<body data-lens="all" data-track="ta">
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand"><span class="mark"></span><span>The employee journey<small>Problems &rarr; Systems &rarr; AI layer</small></span></div>
+    <div class="tracks" role="group" aria-label="Track">
+      <button data-track="ta" class="on">Talent acquisition <i>26</i></button>
+      <button data-track="hr">HR operations <i>36</i></button>
+    </div>
+  </div>
+  <div class="top-row2">
+    <input class="search" id="search" type="search" placeholder="Search a problem, system or tool&hellip;" aria-label="Search">
+    <div class="costf" aria-label="Filter by cost">Cost
+      <button data-cost="all" class="on">All</button>
+      <button data-cost="0">&#8377;0</button>
+      <button data-cost="1">Low</button>
+      <button data-cost="2">Paid</button>
+    </div>
+    <div class="lens" role="group" aria-label="Lens">
+      <button data-lens="all" class="on"><span class="dot"></span>All</button>
+      <button data-lens="problem"><span class="dot"></span>Problems</button>
+      <button data-lens="system"><span class="dot"></span>Systems</button>
+      <button data-lens="ai"><span class="dot"></span>AI layer</button>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div>
+    <h1>First the <span class="p">problems</span>.<br>Then the <span class="s">systems</span>.<br>Only then, <span class="a">AI</span>.</h1>
+    <p>Two sessions, one whiteboard each. The first traced hiring from the moment a manager says &ldquo;I need someone&rdquo; to the day the offer is accepted. The second traced everything after that &mdash; the week before joining, the first ninety days, the years in between, and the way people leave.</p>
+    <p>Put together they are one journey with 62 problems in it. Each one has the system that fixes it and, where it helps, the automation on top. Most of it costs nothing. What it costs is writing things down and then following them.</p>
+  </div>
+  <div class="aside">
+    <b>How to read this</b>
+    <ol>
+      <li>Pick a half of the journey below, then a stage on the left.</li>
+      <li>Each problem has three columns: what's broken, the system that fixes it, and the AI layer on top.</li>
+      <li>Use the lens buttons to present one layer at a time. Filter by cost to see what's free.</li>
+      <li>The rollout at the bottom of each half is a checklist. Tick things off as they ship.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="journey">
+  <div class="jcard on" role="button" tabindex="0" data-track="ta">
+    <h3>Talent acquisition</h3>
+    <div class="range">Requisition &rarr; offer accepted</div>
+    <div class="num">26<span>problems across 7 stages</span></div>
+    <p>Bands, screening, panels, feedback and the offer. Everything that decides whether the right person says yes.</p>
+  </div>
+  <div class="handoff">
+    <div class="line"></div>
+    <div><b>The handoff</b>Acceptance to Day 1 belongs to nobody today. It is the last card of one half and the first stage of the other.</div>
+    <div class="line"></div>
+  </div>
+  <div class="jcard" role="button" tabindex="0" data-track="hr">
+    <h3>HR operations</h3>
+    <div class="range">Pre-boarding &rarr; alumni</div>
+    <div class="num">36<span>problems across 7 stages</span></div>
+    <p>Induction, the first ninety days, engagement, growth and exit. Everything that decides whether they stay.</p>
+  </div>
+</div>
+
+<div data-trk="ta" class="promise">
+  <h2>The promise we make to every candidate</h2>
+  <ul>
+    <li><strong>48 h</strong>Every action you take gets a response from us — apply, interview, offer.</li>
+    <li><strong>1 person</strong>A named recruiter with a phone number, from shortlist to your first day.</li>
+    <li><strong>3 rounds</strong>Maximum. 45–60 minutes each. You know the panel before you walk in.</li>
+    <li><strong>A reason</strong>Every rejection comes with one. Every selection comes with a timeline.</li>
+    <li><strong>No surprises</strong>Salary band, documents and next steps are written down before the offer.</li>
+  </ul>
+</div>
+
+<div data-trk="hr" class="promise">
+  <h2>The promise we make to every employee</h2>
+  <ul>
+    <li><strong>Day 1</strong>Laptop, seat, access and a written plan for your first ninety days, ready before you walk in.</li>
+    <li><strong>Two names</strong>A buddy and an HR contact you can call, from before you join until you're confirmed.</li>
+    <li><strong>30 min</strong>Every month with your manager, on your agenda. Not once a year, attached to money.</li>
+    <li><strong>Every month</strong>Recognition, an engagement plan and a town hall where you can ask anything.</li>
+    <li><strong>A good exit</strong>A real handover, a farewell, and a group you stay part of afterwards.</li>
+  </ul>
+</div>
+
+<div class="wrap">
+  <nav class="rail" aria-label="Stages">
+    <h2>The pipeline</h2>
+    <ol id="rail-ta" data-trk="ta"></ol>
+    <ol id="rail-hr" data-trk="hr"></ol>
+    <div class="count" id="count"></div>
+  </nav>
+  <main id="stages"></main>
+</div>
+
+<div data-trk="ta" class="rollout">
+  <h2>Rollout: more with less</h2>
+  <p>Ship the free, discipline-only fixes first — they solve most of the candidate experience. Add paid tooling only where the free version has been running for a month and the gap is measured.</p>
+  <div class="phases">
+    <div class="phase p1">
+      <h3>Phase 1 — Systems only</h3>
+      <div class="when">Weeks 1–2 · ₹0 · needs discipline, not budget</div>
+      <ul>
+        <li><label><input type="checkbox"><span>Requisition form live in the ATS; no role opens without it</span></label></li>
+        <li><label><input type="checkbox"><span>Band &amp; CTC grid drafted with leadership; every requisition carries a band</span></label></li>
+        <li><label><input type="checkbox"><span>Rewritten stage emails with timeline + SPOC name and number</span></label></li>
+        <li><label><input type="checkbox"><span>Mandatory application fields (CTC, notice, location, relevant years)</span></label></li>
+        <li><label><input type="checkbox"><span>Screening pointers doc per open role, signed by hiring manager</span></label></li>
+        <li><label><input type="checkbox"><span>Interview prep doc + company handbook sent at shortlist</span></label></li>
+        <li><label><input type="checkbox"><span>Hiring SLA charter: max 3 rounds, 24 h feedback, 48 h decision</span></label></li>
+        <li><label><input type="checkbox"><span>Self-scheduling links for panelists; recruiter on every invite</span></label></li>
+        <li><label><input type="checkbox"><span>Brand consistency audit (LinkedIn, ATS, ads, signatures)</span></label></li>
+        <li><label><input type="checkbox"><span>TA playbook v1 written from this discussion</span></label></li>
+      </ul>
+    </div>
+    <div class="phase p2">
+      <h3>Phase 2 — Automate the system</h3>
+      <div class="when">Weeks 3–6 · low cost · WhatsApp API + workflow tool + LLM API</div>
+      <ul>
+        <li><label><input type="checkbox"><span>ATS trigger → email + WhatsApp on apply, shortlist, round result, offer</span></label></li>
+        <li><label><input type="checkbox"><span>AI résumé scoring against the screening pointers; recruiter reviews top + borderline</span></label></li>
+        <li><label><input type="checkbox"><span>Interview transcript → draft scorecard for panelist to confirm</span></label></li>
+        <li><label><input type="checkbox"><span>Overdue-feedback and stuck-stage nudges to Slack</span></label></li>
+        <li><label><input type="checkbox"><span>Post-offer drip: weekly touch, meet-your-manager, buddy, Day-1 logistics</span></label></li>
+        <li><label><input type="checkbox"><span>Careers landing page that explains who we are and how we hire</span></label></li>
+        <li><label><input type="checkbox"><span>Weekly hiring SLA + channel cost report, auto-generated</span></label></li>
+      </ul>
+    </div>
+    <div class="phase p3">
+      <h3>Phase 3 — Scale what's measured</h3>
+      <div class="when">Month 2–3 · paid · only where volume justifies it</div>
+      <ul>
+        <li><label><input type="checkbox"><span>WhatsApp pre-screen bot for bulk roles (collects missing details, availability, updated CV)</span></label></li>
+        <li><label><input type="checkbox"><span>AI voice screening for bulk sales hiring — pilot on one role, compare cost per qualified candidate</span></label></li>
+        <li><label><input type="checkbox"><span>BGV platform after offer acceptance</span></label></li>
+        <li><label><input type="checkbox"><span>Hiring dashboard: funnel, SLA breaches, candidate NPS, cost per hire by channel</span></label></li>
+        <li><label><input type="checkbox"><span>Referral + employee advocacy programme to cut performance-marketing spend</span></label></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div data-trk="ta" class="human">
+  <div>
+    <h2>Where we keep it human</h2>
+    <ul>
+      <li>Lateral and senior candidates get a person on the phone, not a bot. AI prepares the recruiter; it doesn't replace the call.</li>
+      <li>The in-office final round: welcome, coffee, ten minutes of rapport before any question. No automation improves this.</li>
+      <li>Selling the company in the final round is the leader's job. AI only hands them talking points.</li>
+      <li>Rejection reasons are drafted by AI, approved and sent under a recruiter's name.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Where AI is the only way</h2>
+    <ul>
+      <li>Bulk hiring: hundreds of applications per role can't each get a human touch three times. Automated comms and AI screening are what make the promise possible at volume.</li>
+      <li>Consistency: the same timeline, the same template, the same rubric — every time, for every recruiter.</li>
+      <li>Visibility: SLA breaches, stuck candidates and overdue feedback surfaced without anyone chasing.</li>
+    </ul>
+  </div>
+</div>
+
+<div data-trk="hr" class="rollout">
+  <h2>Rollout: more with less</h2>
+  <p>Phase 1 is writing, not buying — it fixes most of what's on this page and costs nothing but discipline. Phase 2 puts the writing on a calendar so it survives a busy month. Only in Phase 3 does anything get automated, and only where it has already run manually for a month.</p>
+  <div class="phases">
+    <div class="phase p1">
+      <h3>Phase 1 — Write it down</h3>
+      <div class="when">Weeks 1–3 · ₹0 · discipline, not budget</div>
+      <ul>
+        <li><label><input type="checkbox"><span>HR glossary: onboarding, induction, buddy, check-in, one-on-one, skip-level, KT, exit</span></label></li>
+        <li><label><input type="checkbox"><span>Ownership map: recruiter, HRBP and manager, with what each one owns and until when</span></label></li>
+        <li><label><input type="checkbox"><span>HR Ops playbook v1 — one page per stage, written from this discussion</span></label></li>
+        <li><label><input type="checkbox"><span>Onboarding form sent at Day-7, complete by Day-3</span></label></li>
+        <li><label><input type="checkbox"><span>Day-1 readiness checklist with IT, admin and finance named on it</span></label></li>
+        <li><label><input type="checkbox"><span>Org map and "who to contact for what" list</span></label></li>
+        <li><label><input type="checkbox"><span>Benefits one-pager: what you get beyond salary</span></label></li>
+        <li><label><input type="checkbox"><span>POSH module and committee contacts inside every induction</span></label></li>
+        <li><label><input type="checkbox"><span>30/60/90 template, filled for sales first, then one per function</span></label></li>
+        <li><label><input type="checkbox"><span>Buddy role defined in five lines, live until confirmation</span></label></li>
+        <li><label><input type="checkbox"><span>Exit flow and one KT format for the whole company</span></label></li>
+      </ul>
+    </div>
+    <div class="phase p2">
+      <h3>Phase 2 — Put it on a calendar</h3>
+      <div class="when">Weeks 4–8 · ₹0 to low · cadence beats intention</div>
+      <ul>
+        <li><label><input type="checkbox"><span>Annual HR calendar published, same dates in all three cities</span></label></li>
+        <li><label><input type="checkbox"><span>Employee engagement charter: weekly light, monthly bigger, festivals and birthdays</span></label></li>
+        <li><label><input type="checkbox"><span>Monthly recognition per function, announced by the 5th</span></label></li>
+        <li><label><input type="checkbox"><span>Weekly internal newsletter replacing the daily mail nobody opens</span></label></li>
+        <li><label><input type="checkbox"><span>Monthly town hall and monthly cross-functional forum</span></label></li>
+        <li><label><input type="checkbox"><span>Monthly one-on-ones on every manager's calendar</span></label></li>
+        <li><label><input type="checkbox"><span>Check-in schedule: recruiter at week 1 and 4, HRBP at Day 15, 45 and 90</span></label></li>
+        <li><label><input type="checkbox"><span>Gifting calendar and one vendor, ordered 30 days ahead</span></label></li>
+        <li><label><input type="checkbox"><span>Probation reviews held in week 12, not week 14</span></label></li>
+      </ul>
+    </div>
+    <div class="phase p3">
+      <h3>Phase 3 — Automate and measure</h3>
+      <div class="when">Month 3+ · low, paid only where volume justifies</div>
+      <ul>
+        <li><label><input type="checkbox"><span>Joining triggers the whole sequence: form, tickets, buddy, check-ins, plan</span></label></li>
+        <li><label><input type="checkbox"><span>Resignation triggers the whole exit sequence: KT, clearance, interview, letters</span></label></li>
+        <li><label><input type="checkbox"><span>Org map regenerated from the HRIS every month with the joiners-movers-leavers diff</span></label></li>
+        <li><label><input type="checkbox"><span>Feedback and exit-interview text clustered into themes, identity stripped</span></label></li>
+        <li><label><input type="checkbox"><span>Quarterly flight-risk view built from one-on-one gaps and leave patterns</span></label></li>
+        <li><label><input type="checkbox"><span>Internal FAQ bot answering leave, reimbursement and policy questions</span></label></li>
+        <li><label><input type="checkbox"><span>Alumni list and rehire pipeline feeding the recruiter before roles go public</span></label></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div data-trk="hr" class="measure">
+  <h2>What we'll hold ourselves to</h2>
+  <ul>
+    <li><b>Time to productive</b>Days until a joiner completes month one of their 30/60/90 plan. Today it's unmeasurable, because there's no plan.</li>
+    <li><b>90-day attrition</b>Anyone leaving inside three months is an onboarding failure, not a hiring one.</li>
+    <li><b>One-on-one completion</b>Percentage of managers who held every monthly conversation. Completion only — never the content.</li>
+    <li><b>Exit reasons, trended</b>The same reason appearing three times is a system problem, not three people.</li>
+  </ul>
+</div>
+
+<div data-trk="hr" class="human">
+  <div>
+    <h2>Where we keep it human</h2>
+    <ul>
+      <li>The farewell speech. A manager naming what someone contributed cannot be generated, and the team can tell.</li>
+      <li>The retention conversation when someone says they want to leave. That is a person and a decision, not a workflow.</li>
+      <li>The leader on the floor with no agenda, and the fifteen minutes of induction they show up for.</li>
+      <li>The buddy. The whole point is that it's a colleague, not a system.</li>
+      <li>Recognition: AI can draft the citation, but the name and the reason come from a manager who watched the work.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Where AI earns its place</h2>
+    <ul>
+      <li>Writing what nobody has time to write: SOPs from a recorded walkthrough, 30/60/90 drafts, the weekly newsletter, the org map.</li>
+      <li>Remembering: forms at Day-7, buddy nudges, overdue KT, probation at week 12, the gifting order 30 days out. Every one of these fails today because a human had to remember it.</li>
+      <li>Reading at scale: six months of feedback and a year of exit interviews turned into themes in an afternoon.</li>
+      <li>Never deciding about a person. AI prepares the conversation. It does not score, rank or replace it.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="foot">Built from the talent acquisition and HR operations process discussions, September 2026. Every problem on this page came from one of those two rooms. Branding, tooling names and city list to be applied per client.</div>
+
+<script>
+const TA_STAGES = [
+{
+  id:"foundations", n:"0", title:"Foundations", sub:"Cross-cutting",
+  desc:"Things that break every stage at once. Fix these and half the downstream problems shrink.",
+  cards:[
+  {
+    title:"One brand, everywhere",
+    who:"Bulk + Lateral", cost:0,
+    problem:"The company operates under one name while the CEO's LinkedIn, the ATS careers page, job ads and several managers' profiles still carry the legacy brand. Candidates don't know which company they applied to or what it actually does.",
+    example:"Search trends show the new brand well ahead of the old one, yet hiring ads still run under the old name. A new joiner set their LinkedIn to the legacy brand because “that's the one people know” and had to be asked to change it.",
+    system:[
+      "Brand audit checklist: LinkedIn company page, every employee headline, ATS careers page, JD template, email signatures, WhatsApp templates, offer letter header.",
+      "One approved “who we are” paragraph (60 words) and one 90-second version, reused in every candidate touchpoint.",
+      "Owner: TA lead with marketing. Done in two weeks; re-checked monthly."
+    ],
+    owner:"TA lead + Marketing", sla:"2 weeks, then monthly",
+    ai:[
+      "LLM drafts the candidate-facing company one-pager, JD boilerplate and the 90-second script from existing marketing copy.",
+      "Monthly scheduled workflow searches LinkedIn, Google and the ATS for the legacy name and posts a list of pages still to fix."
+    ],
+    stack:"Claude · n8n scheduled search"
+  },
+  {
+    title:"Employee bands and CTC ranges",
+    who:"Bulk + Lateral", cost:0,
+    problem:"There are no levels or bands. Hiring managers say “bandwidth is open” but in practice never hire an IC above ~15 LPA, so recruiters run full loops on expensive candidates who are dropped on salary at the end. Internal parity breaks too: five years' total experience with two relevant years is treated like five relevant years.",
+    example:"A candidate cleared every round after being told the range was open. The offer was cancelled because the manager wasn't comfortable with the salary. Several hours of panel time and one very public bad review of the process.",
+    system:[
+      "Leadership defines a band grid per function (e.g. IC1–IC3, M1–M2): scope, relevant experience, CTC min / mid / max.",
+      "Every requisition carries a band. Recruiters screen out of band unless the manager approves in writing on the requisition.",
+      "Negotiation ownership: the manager scores fit and recommends a point in band; TA/HR negotiates and closes within it.",
+      "The band and the next band up are shown to the candidate as the growth path."
+    ],
+    owner:"Leadership + HR", sla:"Grid in 2 weeks",
+    ai:[
+      "Draft the band framework from anonymised payroll data plus market benchmarks; iterate with leadership in one sitting.",
+      "Band table lives in a sheet; the ATS requisition form reads from it so nobody types a range by hand."
+    ],
+    stack:"Claude · Sheet/Airtable · ATS form"
+  },
+  {
+    title:"Ownership from the business side",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Recruiters spend the day chasing interviews, feedback, decisions and documents. Panels are assembled on the fly, sometimes with people who don't work in the area. The candidate pays for it.",
+    example:"Two rounds were promised verbally. The candidate sat from 11 AM to 8 PM through six or seven conversations with seven or eight people. Some shortlisted candidates declined to come back at all.",
+    system:[
+      "A one-page hiring SLA charter signed by leadership: panel named at requisition, max 3 rounds, 45–60 min each, scorecard within 24 h, decision within 48 h of the final round.",
+      "Panelist certification: a short session on how to open, what to ask, how to score, how to treat a candidate. Only certified panelists interview.",
+      "Weekly hiring review where SLA breaches are visible by manager, not by recruiter."
+    ],
+    owner:"HR head + function heads", sla:"Charter in week 1",
+    ai:[
+      "Weekly SLA report generated from ATS timestamps and posted to Slack.",
+      "Automatic nudge to a panelist when a scorecard is overdue; escalation to their lead after 48 h."
+    ],
+    stack:"n8n · ATS API · Slack"
+  },
+  {
+    title:"Sourcing channels for bulk hiring",
+    who:"Bulk", cost:1,
+    problem:"Bulk sales hiring runs on performance marketing at roughly ₹30K a day. Job boards return volume without fit — of a hundred thousand registered profiles a handful match. Organic employer presence on social is close to zero, so nothing compounds.",
+    example:"The team could not agree whether the job board is the problem or how it's being used. Either way, nobody could say the cost per qualified candidate per channel.",
+    system:[
+      "Channel scorecard: cost per screened-qualified candidate, per channel, per month. Decide spend from that number, not from habit.",
+      "Referral programme with a fixed bounty paid on 90-day retention; alumni and “good but not now” pool re-engaged every quarter.",
+      "Employee advocacy calendar: two posts a week from the team, drafted for them.",
+      "Bulk roles: boards + referrals + tightly targeted ads. Lateral roles: LinkedIn, referrals and direct outreach; no paid ads."
+    ],
+    owner:"TA lead", sla:"Scorecard monthly",
+    ai:[
+      "AI résumé matching on job-board exports so the cheap, noisy channel becomes usable.",
+      "LLM drafts advocacy posts and channel-specific JD variants; weekly cost-per-qualified report assembled automatically."
+    ],
+    stack:"Claude API · n8n · board exports"
+  },
+  {
+    title:"A written TA playbook",
+    who:"Bulk + Lateral", cost:0,
+    problem:"The process lives in people's heads. Four people describe it four ways; a new recruiter or an intern inherits none of it.",
+    example:"In one morning the team discovered that the pre-JD stage, the mid-funnel stage and the post-offer stage were each being run by a different person with a different mental model.",
+    system:[
+      "One living playbook: stages, owners, SLAs, every template (emails, WhatsApp, scorecards, prep doc, requisition form), FAQ for candidates and managers.",
+      "Versioned. Reviewed monthly against candidate feedback and SLA data.",
+      "Every process change on this page lands in the playbook first, then in tooling."
+    ],
+    owner:"TA lead", sla:"v1 in week 2",
+    ai:[
+      "Draft v1 from the meeting transcript and this page.",
+      "Keep it as a Claude project or skill so any recruiter can ask “what do I send after an R1 rejection?” and get the exact template."
+    ],
+    stack:"Claude project / skill"
+  }
+]},
+{
+  id:"requisition", n:"1", title:"Requisition", sub:"Before the JD goes out",
+  desc:"Most bad hires and bad candidate experiences are decided here, before a single résumé arrives.",
+  cards:[
+  {
+    title:"Requirements arrive verbally and keep changing",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Managers open roles on a call. Location, package and experience change across calls with different recruiters; nothing is recorded, so nobody knows which version is current.",
+    example:"A manager called with one city to hire for. The next day he called another recruiter with six. The first recruiter was still working on the original brief.",
+    system:[
+      "Requisition form in the ATS (it already exists — switch it on): title, band, CTC range, relevant experience, location(s), must-have skills, number of rounds with named panelists, deadline, business justification.",
+      "A role is not “open” until the form is complete and approved. Changes happen only by editing the form, which keeps an audit trail.",
+      "Recruiter acknowledges within 24 h and books the pre-brief."
+    ],
+    owner:"Hiring manager submits, TA lead approves", sla:"24 h acknowledgement",
+    ai:[
+      "A manager sends a voice note or a Slack message; the LLM turns it into a filled requisition draft plus a JD and flags missing fields before it goes for approval.",
+      "Change diff summarised and posted to the role's channel so every recruiter sees the current version."
+    ],
+    stack:"Claude · Slack · ATS requisition form"
+  },
+  {
+    title:"The pre-brief is too shallow to screen well",
+    who:"Lateral", cost:0,
+    problem:"A 30-minute pre-brief isn't enough for a new or senior role. Recruiters then can't shortlist 10 from 20 with confidence, and managers reject the shortlist for reasons that were never written down.",
+    example:"The team split between two methods: shadow the team for two or three days, or pull ten sample profiles and calibrate with the manager. The agreement was that whichever route is used, the output has to be a document.",
+    system:[
+      "Pre-brief SOP ends in a Screening Pointers doc: must-haves, nice-to-haves, red flags, sample questions, three calibrated “yes” profiles and three “no” profiles with the reason.",
+      "New or senior role: half-day shadow with the team plus a calibration round. Repeat role: 30-minute refresh against the last doc.",
+      "Manager signs the doc. Shortlists are judged against it, not against memory."
+    ],
+    owner:"Recruiter + Hiring manager", sla:"Doc before sourcing starts",
+    ai:[
+      "Generate the rubric draft from the JD and the pre-brief transcript.",
+      "Calibrate by having the model score the six sample profiles and comparing with the manager's verdict; disagreements become rubric edits."
+    ],
+    stack:"Claude · meeting transcript"
+  },
+  {
+    title:"The interview plan is invented on the day",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Rounds, panel and duration are decided as candidates arrive. That's how one round becomes seven.",
+    example:"“Panel isn't decided for these roles even today. Ten people take interviews for one candidate.”",
+    system:[
+      "Interview plan attached to every requisition: rounds (max 3), what each round tests, named panelist and backup, duration, scorecard template.",
+      "The same plan is what the candidate receives in the prep doc — so it can't change silently."
+    ],
+    owner:"Hiring manager + Recruiter", sla:"With the requisition",
+    ai:[
+      "Plan template generated per role family (sales IC, sales manager, ops, tech) from the competency list; manager edits, doesn't start from blank."
+    ],
+    stack:"Claude"
+  }
+]},
+{
+  id:"sourcing", n:"2", title:"Sourcing & application", sub:"First contact",
+  desc:"The candidate's first impression of us is formed by a landing page and one automated email. Both are currently bad.",
+  cards:[
+  {
+    title:"Silence after applying",
+    who:"Bulk + Lateral", cost:1,
+    problem:"A candidate submits the form and hears nothing. When the ATS does send something, it reads “You have been moved from source to screening. Congrats.” No timeline, no name, no idea what the company does.",
+    example:"A recruiter's own story: applied in July, forgot the application existed, got a call weeks later. Other companies at least tell the candidate when to expect a call.",
+    system:[
+      "Instant acknowledgement on apply: thank you, one paragraph on what we do, what happens next, the timeline (“we review every profile within 48 h; if shortlisted you'll hear from us within 3 working days”), and what no-news means.",
+      "Every stage-move email rewritten with three fixed elements: what just happened, what happens next and by when, whom to contact.",
+      "WhatsApp mirrors every email — emails are missed 50–60% of the time; WhatsApp is read. Consent captured on the form."
+    ],
+    owner:"TA lead owns templates", sla:"Instant; 48 h review",
+    ai:[
+      "ATS stage change → workflow → personalised email + WhatsApp (name, role, recruiter, timeline). No recruiter touches it.",
+      "Reply handling: candidate replies on WhatsApp are classified (reschedule, question, withdraw) and routed to the SPOC."
+    ],
+    stack:"ATS webhook · n8n · WhatsApp Business API (or Periskope) · Claude for reply triage"
+  },
+  {
+    title:"The careers page doesn't sell or explain",
+    who:"Bulk + Lateral", cost:0,
+    problem:"“Careers” on the website redirects to a bare ATS list. No about, no culture, no explanation of how we hire. It looks like a placeholder, so candidates treat the company like one.",
+    example:"Clicking through the flow in the meeting: a company logo, a list of jobs, and nothing else — under the legacy brand name.",
+    system:[
+      "One careers landing page: who we are, how we hire (three steps with timelines), the teams, what to expect, FAQ. The ATS list embedded below it.",
+      "The interview prep guide and company handbook linked from the page so candidates can read them before applying."
+    ],
+    owner:"TA lead + Marketing", sla:"Phase 2",
+    ai:[
+      "Generate the copy and a single static page; host it free. No CMS needed."
+    ],
+    stack:"Claude · static hosting"
+  },
+  {
+    title:"Incomplete applications at volume",
+    who:"Bulk", cost:1,
+    problem:"A bulk role pulls 100–200 profiles with missing CTC, notice period or location. Recruiters spend screening calls collecting basics instead of assessing.",
+    example:"The team debated a free fix (mandatory fields — might lose a few candidates) against a paid one (a WhatsApp bot that asks politely). Decision: mandatory fields now, bot once volume justifies it.",
+    system:[
+      "Phase 1: mandatory fields on the form — current and expected CTC, notice period, location, years of relevant experience, WhatsApp consent. Nothing else.",
+      "Phase 3: for bulk roles, a WhatsApp pre-screen that collects anything missing, an updated résumé and availability, before a human calls."
+    ],
+    owner:"TA lead", sla:"Fields in week 1",
+    ai:[
+      "WhatsApp bot with five questions; the LLM parses free-text answers into ATS fields and flags out-of-band CTC before the recruiter's call."
+    ],
+    stack:"WhatsApp API · Claude · n8n"
+  }
+]},
+{
+  id:"screening", n:"3", title:"Screening", sub:"Résumé to first call",
+  desc:"Where the recruiter's judgement matters most and where volume hurts most. Systems here decide whether the rest of the funnel is fed well.",
+  cards:[
+  {
+    title:"Manual résumé screening can't keep up",
+    who:"Bulk", cost:1,
+    problem:"Screening happens by scrolling. Good profiles get missed, weak ones get calls, and the 48-hour promise breaks on the first busy day.",
+    example:"For bulk hiring “what gets compromised is experience — the number of candidates is huge and we miss people.” For lateral roles the team was clear: a human does the call.",
+    system:[
+      "Every profile screened against the Screening Pointers doc and marked shortlist / pool / reject with a one-line reason, within 48 h of applying.",
+      "Bulk: AI first pass, recruiter reviews the top slice and the borderline. Lateral: recruiter screens every profile; AI only pre-reads.",
+      "Screening call script per role, 15 minutes, ending with the candidate knowing the next step."
+    ],
+    owner:"Recruiter", sla:"48 h per profile",
+    ai:[
+      "Résumé scored against the rubric with reasons, via the ATS's AI or a small script on the LLM API — cost is pennies per profile.",
+      "Bulk only, and only after the screening bot is live: AI voice screening pilot on one role, judged on cost per qualified candidate against recruiter calls. Voice is the expensive layer; earn it with data."
+    ],
+    stack:"Claude API · ATS AI · voice agent (pilot only)"
+  },
+  {
+    title:"No named owner, no timeline",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Once shortlisted, the candidate still doesn't know who is handling them or when the first round will be. If we forget, there's nobody for them to call.",
+    example:"“If I'm the owner, give my name and my number to the candidate. If we forget, at least they'll call us.”",
+    system:[
+      "On shortlist, the candidate receives their SPOC: recruiter name, phone, expected R1 window, prep doc link.",
+      "The same SPOC stays until Day 1. Handovers happen only with a written note to the candidate.",
+      "Drip cadence: something from us every 3–4 days, even if it's “still on track, R1 is Thursday.”"
+    ],
+    owner:"Recruiter (SPOC)", sla:"Within 1 working day of shortlist",
+    ai:[
+      "Round-robin SPOC assignment by role and load; the shortlist email pulls the SPOC's details automatically.",
+      "Stuck-stage alert: any candidate with no outbound touch in 4 days appears on the SPOC's Slack in the morning."
+    ],
+    stack:"ATS · n8n · Slack"
+  },
+  {
+    title:"Candidates don't know what they're walking into",
+    who:"Bulk + Lateral", cost:0,
+    problem:"No information on who they'll meet, how many rounds, what's assessed, or what documents come later — so the process feels random and the document ask feels like a trap.",
+    example:"The prep guide with company information and sales videos got the best feedback of anything we sent: “not every company does that.” Separately, the team agreed documents belong in the prep doc, not in the screening call.",
+    system:[
+      "Interview Prep Doc sent at shortlist: about the company, the role, panel names and roles, rounds with duration, what each round assesses, logistics, what happens after selection.",
+      "The post-selection section lists the documents we'll ask for with a reason for each (e.g. payslip or bank statement for legal name and CTC). No government ID before the offer.",
+      "Company handbook kept and expanded — it's the one thing candidates praised."
+    ],
+    owner:"Recruiter", sla:"With the shortlist email",
+    ai:[
+      "Per-role prep doc generated from the requisition and interview plan; panel bios pulled from LinkedIn once and cached."
+    ],
+    stack:"Claude · doc template"
+  },
+  {
+    title:"Scheduling by chat",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Recruiters negotiate slots by message, candidates are told when to show up, and reschedules get lost between two recruiters. The manager's calendar is the bottleneck nobody can see.",
+    example:"A candidate told one recruiter she couldn't make the slot. The message never reached the recruiter running the interview. It got messed up.",
+    system:[
+      "Panelists hold two or three interview slots a week in their calendar as a standing rule.",
+      "Candidates book from those slots through a scheduling link owned by TA — the recruiter is on every invite and the manager's email is never exposed.",
+      "Self-serve reschedule with 24 h notice; anything later goes through the SPOC."
+    ],
+    owner:"Recruiter sets up; panelists keep slots", sla:"Booking link in shortlist email",
+    ai:[
+      "Booking → ATS stage update → WhatsApp confirmation → reminders at 24 h and 1 h. No-show → automatic reschedule offer."
+    ],
+    stack:"Calendly / Google appointment · n8n · WhatsApp"
+  }
+]},
+{
+  id:"interviews", n:"4", title:"Interviews", sub:"R1 to the final round",
+  desc:"The same system applies between every round: the candidate always knows the result, the reason, and the next step.",
+  cards:[
+  {
+    title:"Untrained panels, marathon rounds",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Interviewers don't know how long to take, what to ask or how to score. Interviews run three hours, competencies aren't defined, and candidates leave feeling processed.",
+    example:"“You have to give a training and teach them how much interview to take. I ask somebody to come for one round, they took seven or eight.”",
+    system:[
+      "Max 3 rounds, 45–60 minutes each, panel fixed in the interview plan. Anyone else who wants to meet the candidate does it after the offer.",
+      "Scorecard per round: 4–6 competencies scored 1–5 with evidence, plus a hire / no-hire and a recommended point in band.",
+      "Panelist certification: a two-hour session covering opening, questioning, scoring, candidate courtesy and the 24 h feedback rule."
+    ],
+    owner:"HR head runs certification", sla:"24 h scorecard",
+    ai:[
+      "Question bank per competency and per round generated from the rubric.",
+      "New panelists rehearse with a mock candidate in Claude before their first real interview."
+    ],
+    stack:"Claude"
+  },
+  {
+    title:"Feedback lags, then drifts",
+    who:"Bulk + Lateral", cost:1,
+    problem:"Feedback arrives days later, gets revised after a hallway conversation, and is never in the ATS. The recruiter can't tell the candidate anything true.",
+    example:"“They take a lot of time to give feedback, and sometimes they change it later according to themselves.”",
+    system:[
+      "Scorecard in the ATS within 24 h. No scorecard, no next round scheduled — the rule applies to everyone.",
+      "Ten-minute recruiter–panelist debrief the same day; the scorecard is what's discussed, not memory.",
+      "The scorecard is the single record. Changing it means a written note, not a new verbal version."
+    ],
+    owner:"Panelist", sla:"24 h",
+    ai:[
+      "Interview recorded with consent; transcript → draft scorecard against the rubric → panelist confirms or edits in two minutes.",
+      "Overdue scorecard nudges; escalation after 48 h."
+    ],
+    stack:"Meet/Fireflies transcript · Claude · ATS · n8n"
+  },
+  {
+    title:"Rejections without a reason, selections without a date",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Rejected candidates are left in silence. Selected candidates get a bare email with no timeline for the next round, so they assume the worst and keep interviewing elsewhere.",
+    example:"Rejected candidates asked the same thing on every call-back: what didn't fit? Nobody had told them.",
+    system:[
+      "Rejection: within 24 h (2 h for bulk), a respectful email with a reason category and whether we'd like to keep them in the pool.",
+      "Selection: a call the same or next day plus an email with the next round's format, panel, duration and window.",
+      "Rule for every stage: candidate input X → our output Y within 48 h, in writing."
+    ],
+    owner:"Recruiter (SPOC)", sla:"24 h / 48 h",
+    ai:[
+      "Draft the rejection or selection email from the scorecard's reason category; recruiter approves; send under the recruiter's name.",
+      "Candidates marked “pool” get re-surfaced automatically when a matching requisition opens."
+    ],
+    stack:"Claude · ATS · n8n"
+  },
+  {
+    title:"No feedback loop from the candidate",
+    who:"Bulk + Lateral", cost:0,
+    problem:"We only learn the process was bad when a candidate declines the offer. There's no routine way for candidates or panelists to report friction.",
+    example:"The three-question feedback form was a late addition on the whiteboard — “forgot this one, good point.”",
+    system:[
+      "Three-question feedback form to the candidate after every round and after the offer decision; a two-question form to the panelist about the process.",
+      "Candidate NPS reviewed monthly by stage and by manager; goes into the playbook review."
+    ],
+    owner:"TA lead", sla:"Monthly review",
+    ai:[
+      "Monthly summary of free-text feedback grouped by theme and stage, with the three most-repeated complaints on top."
+    ],
+    stack:"Form · Claude"
+  }
+]},
+{
+  id:"final", n:"5", title:"Final round & selection", sub:"In the room",
+  desc:"The candidate has invested hours. This is where we either make them want us or lose them to a company that simply behaved better.",
+  cards:[
+  {
+    title:"Walked straight into the cabin",
+    who:"Lateral", cost:0,
+    problem:"A candidate arrives for an in-person round and is taken directly to whichever leader is free — “he's here, take it.” No welcome, no settling, no agenda.",
+    example:"Observed across three different managers in the same week. The candidate visibly stressed before the first question.",
+    system:[
+      "In-person protocol: candidate asked to arrive 15 minutes early; SPOC greets them; water or coffee; ten minutes of rapport and the agenda for the visit; panel introduced by name and role.",
+      "Every visit ends with the SPOC: what happens next, by when, and a thank-you.",
+      "This is the one stage where nothing is automated."
+    ],
+    owner:"Recruiter (SPOC)", sla:"Every in-person round",
+    ai:[],
+    stack:""
+  },
+  {
+    title:"The panel doesn't sell the company",
+    who:"Lateral", cost:0,
+    problem:"By the final round the candidate is still the only one showing interest. Leaders assess; nobody pitches the team, the vision or the growth path.",
+    example:"“It shouldn't look like he's the only one interested. The panel and the recruiter should show we're excited too.”",
+    system:[
+      "Final round is half assessment, half selling: the leader covers vision, team, what the first 90 days look like and the band-based growth path.",
+      "HR head or function head has a 10-minute touchpoint with every final-round lateral candidate.",
+      "The candidate leaves able to answer “why this company?” in one sentence."
+    ],
+    owner:"Hiring manager + HR head", sla:"Every final round",
+    ai:[
+      "A one-page talking-points card per candidate: their motivations from the screening notes, the growth path for their band, and the two things they asked about most."
+    ],
+    stack:"Claude from screening notes"
+  },
+  {
+    title:"Document collection feels like a trap",
+    who:"Bulk + Lateral", cost:1,
+    problem:"Candidates refuse to share government ID before an offer, and they're right to be cautious. The team argued about when to say it — screening call or later — and about what to ask for at all.",
+    example:"Decision from the HR head: don't ask for Aadhaar. What we need is the legal name and current CTC, and a payslip or bank statement gives both. Every document we ask for needs a stated reason. The process goes in the prep doc, not the screening call.",
+    system:[
+      "Pre-offer document list kept minimal: résumé, last payslips or bank statement (legal name, CTC). Government ID only after offer acceptance, for onboarding.",
+      "Each document listed with its reason, in the prep doc the candidate already has.",
+      "Secure upload link, not WhatsApp attachments. Background verification through a platform after acceptance."
+    ],
+    owner:"Recruiter; BGV via People Ops", sla:"Documents within 3 days of selection",
+    ai:[
+      "Checklist with automatic reminders; the LLM extracts legal name and CTC from the payslip into the ATS with consent, so nobody retypes."
+    ],
+    stack:"n8n · Claude document extraction · BGV platform (Phase 3)"
+  },
+  {
+    title:"Salary decided in the dark",
+    who:"Bulk + Lateral", cost:0,
+    problem:"After the final round, the manager decides fit and salary alone, sometimes against the range the recruiter quoted. The candidate hears a number that contradicts an earlier conversation.",
+    example:"Manager preference for the cheaper of two similar candidates is rational for a budget; it's a disaster when the more expensive one was already told the range was open.",
+    system:[
+      "Manager submits the final scorecard with a recommended point in band and the reason.",
+      "TA/HR negotiates within band using the candidate's stated expectation from screening. Out-of-band needs written approval from the function head.",
+      "Decision to the candidate within 48 h of the final round, in writing."
+    ],
+    owner:"HM recommends, TA closes", sla:"48 h",
+    ai:[
+      "Offer calculator: band, recommended point, internal parity check against peers with similar relevant experience — flags anything that would break the grid."
+    ],
+    stack:"Sheet · Claude"
+  }
+]},
+{
+  id:"offer", n:"6", title:"Offer & pre-joining", sub:"Selection to Day 1",
+  desc:"The offer is where we lose good people to companies that just replied faster. Keep the candidate warm until they're sitting at a desk.",
+  cards:[
+  {
+    title:"Offer delays with no communication",
+    who:"Bulk + Lateral", cost:0,
+    problem:"Between final selection and the offer letter, days pass. The candidate doesn't know who is preparing it, when it's coming, or whether something went wrong.",
+    example:"The person who sends offer letters found out about a selection only when the recruiter asked where the letter was.",
+    system:[
+      "Offer letter within 3 working days of selection. The candidate is told this timeline and the SPOC's number on the selection call.",
+      "People Ops is looped in at selection, not after; a single handoff note with band, CTC, start date and any negotiated terms.",
+      "If anything slips, the candidate hears it from us before the deadline passes."
+    ],
+    owner:"Recruiter → People Ops", sla:"3 working days",
+    ai:[
+      "Selection in the ATS → task created for People Ops with the handoff note pre-filled → Slack alert if the offer isn't out in 3 days."
+    ],
+    stack:"ATS · n8n · Slack"
+  },
+  {
+    title:"Silence after the offer, then a no-show",
+    who:"Bulk + Lateral", cost:1,
+    problem:"The offer goes out, the candidate accepts, and then nothing until Day 1. Another company keeps calling. The candidate goes there.",
+    example:"Candidates we lost said the other company simply gave a better response after the offer. Not a better offer — a better response.",
+    system:[
+      "Offer drip until Day 1: offer call + email with next steps → acceptance → welcome note → weekly WhatsApp touch → 15-minute meet-your-manager call → buddy introduced → Day-1 logistics three days before → joining group.",
+      "Every candidate input (acceptance, document, question) gets an output from us within 48 h.",
+      "No reply to two consecutive touches → the SPOC calls the same day."
+    ],
+    owner:"Recruiter (SPOC) + Hiring manager", sla:"Weekly touch minimum",
+    ai:[
+      "Scheduled drip on WhatsApp and email with the manager and buddy details filled in automatically.",
+      "Personalised welcome note drafted from the candidate's interview notes; quiet-candidate risk flag surfaces to the SPOC."
+    ],
+    stack:"n8n · WhatsApp · Claude"
+  },
+  {
+    title:"Handoff to onboarding is a cliff",
+    who:"Bulk + Lateral", cost:0,
+    problem:"TA's job ends at acceptance; HR Ops starts on Day 1. The gap in between belongs to nobody, and the quality of the hire is never fed back to the recruiter.",
+    example:"Nobody had ever collected candidate feedback on onboarding; the TA team assumed HR had it, HR assumed TA did.",
+    system:[
+      "Pre-joining checklist owned by TA until Day 1, then handed to HR Ops with the candidate's file and the interview notes.",
+      "Recruiter attends the Day-1 welcome. A 30-day check-in with the manager and the new joiner feeds a quality-of-hire score back into the screening rubric."
+    ],
+    owner:"TA → HR Ops", sla:"Handoff on Day 1; check-in at 30 days",
+    ai:[
+      "Offer acceptance auto-creates the onboarding task list; the 30-day check-in form summarised and linked to the requisition so the rubric improves per role."
+    ],
+    stack:"n8n · ATS · form"
+  }
+]}
+];
+
+const HR_STAGES = [
+{
+  id:"foundations", n:"0", title:"Foundations", sub:"Cross-cutting",
+  desc:"Four things that break every other stage at once. Fix these and half of what follows gets easier on its own.",
+  cards:[
+  {
+    title:"We don't use the same words for the same things",
+    who:"HR team", cost:0,
+    problem:"Onboarding, induction, check-in and skip-level mean different things to different people in the same team. If HR can't name the steps consistently, no manager outside HR has a chance of following them, and every process discussion restarts from vocabulary.",
+    example:"\u201cOnboarding is before day one, induction is from day one\u201d had to be settled mid-meeting. Skip-level was used to mean both a meeting with the manager's manager and an informal call with no agenda \u2014 two useful things with one name.",
+    system:[
+      "A one-page glossary: pre-boarding, onboarding, induction, buddy, check-in, one-on-one, skip-level, KT, exit interview, alumni. One line each, one owner each.",
+      "Every HR document, form and calendar invite uses those names and no others. Rename existing invites in a single pass.",
+      "New HR joiners are taken through the glossary in their own induction, so the vocabulary doesn't drift again."
+    ],
+    owner:"HR head", sla:"Glossary in 3 days; in use from week 1",
+    ai:[
+      "Draft the glossary from the meeting transcript and the existing invite names, then edit once instead of writing from blank.",
+      "A weekly check flags any calendar invite or document using a term that isn't on the list."
+    ],
+    stack:"Claude \u00b7 Sheets \u00b7 Slack"
+  },
+  {
+    title:"The process lives in one person's head",
+    who:"All roles", cost:0,
+    problem:"Some of this already works. Sales joiners do get a week of training, then demo calls, then the floor with a peer. But it is written nowhere, so it changes with whoever is free that morning, and it cannot be improved because it cannot be seen.",
+    example:"Stated flatly in the room: it is happening, but it is not documented and no one knows it is happening \u2014 the only reason anyone knows is that one person travelled to the offices and watched it happen.",
+    system:[
+      "One HR Ops playbook, a page per stage: what happens, who owns it, what the employee receives, and what \u201cdone\u201d looks like.",
+      "The rule that makes it stick: if a step isn't in the playbook, it isn't a step. Anything invented gets added the same week.",
+      "Version and date on every page, reviewed quarterly with function heads."
+    ],
+    owner:"HR head + function heads", sla:"v1 in 3 weeks; quarterly review",
+    ai:[
+      "Record a walkthrough of each process that already works, transcribe it, and turn it into a draft SOP. HR corrects rather than composes \u2014 the difference between a two-week job and a two-day one.",
+      "Keep the playbook as plain text in a shared drive so every change is visible and reversible."
+    ],
+    stack:"Meeting transcript \u00b7 Claude \u00b7 shared drive"
+  },
+  {
+    title:"Who owns the employee after Day 1?",
+    who:"HR + managers", cost:0,
+    problem:"Recruiter, HRBP and reporting manager all touch the same new joiner, and none of the three has a written boundary. The result is either three people doing the same thing or, far more often, nobody doing it.",
+    example:"The longest argument in the meeting was whether the recruiter or the HRBP checks in on a new joiner. Both sides were right \u2014 the recruiter has the rapport, the HRBP owns the relationship \u2014 and nothing was written down at the end of it.",
+    system:[
+      "One page: the recruiter owns the warm relationship to Day 30. The HRBP owns the employee relationship from Day 1 to exit. The manager owns performance and the one-on-one.",
+      "Only the HRBP schedules formal check-ins and skip-levels. The recruiter's calls stay informal and unscheduled by design \u2014 that is what makes them work.",
+      "Both survive: an informal recruiter call in week 1 and week 4, formal HRBP check-ins at Day 15, 45 and 90.",
+      "Every joiner's file carries all three names with phone numbers."
+    ],
+    owner:"HR head", sla:"Map signed in week 1",
+    ai:[
+      "On the joining date, a workflow writes the three names into the record, schedules both sets of touchpoints, and pings whoever misses one.",
+      "No new tool needed \u2014 calendar plus the existing ATS fields."
+    ],
+    stack:"n8n \u00b7 ATS \u00b7 calendar"
+  },
+  {
+    title:"Three cities, one company",
+    who:"All locations", cost:0,
+    problem:"Each office runs its own version of induction, celebration, gifting and engagement. Employees compare notes across cities and somebody always concludes they're at the branch office.",
+    example:"When the September anniversary came up, nobody could say what would happen, because three cities now have to be planned at once and there was no plan for any of them.",
+    system:[
+      "One HR calendar for the year, published in advance: engagement cadence, festivals, recognition cycles, town halls, feedback windows, the anniversary, the offsite.",
+      "Everything on it happens in all three cities on the same date. Budget set per head, not per office.",
+      "One named HR anchor per city, executing the same brief locally rather than inventing a local version."
+    ],
+    owner:"HR head + city anchors", sla:"Calendar published; monthly plan 2 weeks ahead",
+    ai:[
+      "The calendar generates the events and a per-city checklist automatically from one sheet.",
+      "A weekly digest shows which city hasn't confirmed which item, so chasing is a glance rather than a round of calls."
+    ],
+    stack:"Sheet \u00b7 n8n \u00b7 calendar"
+  }
+]},
+{
+  id:"preboarding", n:"1", title:"Pre-boarding", sub:"Offer accepted \u2192 Day 0",
+  desc:"The week nobody owns. The candidate has said yes, the recruiter has moved on, and HR Ops hasn't started \u2014 which is exactly when second thoughts happen.",
+  cards:[
+  {
+    title:"The onboarding form goes out late, over WhatsApp",
+    who:"All roles", cost:0,
+    problem:"Joining details and documents are collected close to the joining date, in an ad-hoc group, and nobody checks what came back. Missing details get discovered on Day 1, which is the worst possible day to discover them.",
+    example:"The team's own description of the current process: create a group, people come in and go out, they fill it back \u2014 and then the honest question, did we cross-check everything?",
+    system:[
+      "One onboarding form, sent seven days before the joining date, hard cut-off at three days.",
+      "Fields: personal and contact details, documents, bank and statutory details, emergency contact, shirt size, laptop preference, home address for the welcome kit.",
+      "HR checks completeness against a list and chases on Day-5 and Day-3, not on Day 1.",
+      "Batch joiners share one joining date. No extra dates unless the business asks for them."
+    ],
+    owner:"HR Ops", sla:"Sent Day-7, complete by Day-3",
+    ai:[
+      "Offer acceptance triggers the send; reminders fire automatically at Day-5 and Day-3.",
+      "A completeness check flags missing fields and unreadable uploads before a human opens the file."
+    ],
+    stack:"ATS form \u00b7 n8n \u00b7 WhatsApp/email"
+  },
+  {
+    title:"The joiner doesn't know what's about to happen",
+    who:"All roles", cost:0,
+    problem:"Between accepting the offer and Day 1, the new joiner hears nothing about the job itself. No schedule, no agenda, no idea what the first week contains \u2014 and no way to arrive prepared.",
+    example:"Written on the board as the core onboarding problem in five words: no structure, no planning, no scheduling. Then a fourth was added \u2014 no intimation to the candidate about what happens in the coming weeks.",
+    system:[
+      "A \u201cyour first thirty days\u201d note sent with the onboarding form: reporting time and address, Day 1 agenda, dress code, who receives them, the buddy's name, and the week-1 schedule.",
+      "One template for every role, with the role-specific part pasted in from the manager's 30/60/90 plan.",
+      "One short message the evening before Day 1: where to come, what to bring, whom to call if anything goes wrong."
+    ],
+    owner:"HR Ops + hiring manager", sla:"Note at Day-7; message the evening before",
+    ai:[
+      "The note assembles itself from the requisition and the manager's plan into a fixed template.",
+      "The Day-1 message is scheduled the moment the joining date is confirmed, so it can't be forgotten in a busy week."
+    ],
+    stack:"Claude \u00b7 n8n \u00b7 WhatsApp"
+  },
+  {
+    title:"Nobody tells them why we picked them",
+    who:"All roles", cost:0,
+    problem:"The offer letter states the salary. It says nothing about what the panel saw, what they'll own, or what the company will help them get better at. That paragraph is the cheapest loyalty available and it is currently unused.",
+    example:"The room asked for a personalised experience and for the joiner to know why they're a good fit \u2014 then moved to the next point without giving it an owner.",
+    system:[
+      "The hiring manager writes three lines before the offer goes out: what stood out, what you'll own in the first quarter, what we'll help you get better at.",
+      "HR sends it as a note from the manager, not from HR. It is a different email when it comes from the person you'll report to.",
+      "The same three lines open the Day-30 check-in and the probation review, which turns a compliment into a commitment."
+    ],
+    owner:"Hiring manager", sla:"Written before the offer is released",
+    ai:[
+      "Interview scorecards summarised into a draft paragraph for the manager to edit and approve.",
+      "Never sent unedited \u2014 the value is entirely in it being true and specific."
+    ],
+    stack:"ATS scorecards \u00b7 Claude"
+  },
+  {
+    title:"Day 1 logistics are arranged on Day 1",
+    who:"All roles", cost:0,
+    problem:"Laptop, seat, ID card, email, tool access, payroll and insurance enrolment are chased after the person arrives. The first impression of the company becomes a morning of waiting for somebody to find a machine.",
+    example:"This one never came up in the discussion. That is the point: there is no checklist for it to fail against, so it fails quietly, one joiner at a time.",
+    system:[
+      "A Day-1 readiness checklist owned by HR Ops, with IT, admin and finance as named assignees and everything due two days before joining.",
+      "Nothing counts as ready until the assignee confirms it \u2014 not when HR assumes it.",
+      "If an item is still red at Day-2, HR calls the manager and the joining is either resourced or moved. Moving a start date is cheaper than wasting a first week."
+    ],
+    owner:"HR Ops \u00b7 IT \u00b7 Admin", sla:"All items green by Day-2",
+    ai:[
+      "Offer acceptance creates the full ticket set with due dates and assignees automatically.",
+      "A Day-2 digest shows only what's red, with escalation to the assignee's manager."
+    ],
+    stack:"n8n \u00b7 ticketing \u00b7 Slack"
+  }
+]},
+{
+  id:"induction", n:"2", title:"Induction", sub:"Day 1 \u2192 week 1",
+  desc:"Everything the company owes a person in their first week: who we are, who everyone else is, what they're entitled to, and how to stay safe here.",
+  cards:[
+  {
+    title:"Day 1 is a form-filling session",
+    who:"All roles", cost:0,
+    problem:"Induction is treated as paperwork. The company, the product, the customers and the people get covered in corridor conversations, if at all, and the joiner assembles their understanding from whoever they happen to sit next to.",
+    example:"A team member who had joined recently was asked what her onboarding contained. The answer was that it hadn't really happened \u2014 which is how the gap got onto the list in the first place.",
+    system:[
+      "A fixed half-day: who we are and what we sell, a live product demo, how the org is structured, policies and systems, POSH and safety, benefits and payroll, then a floor walk and introductions.",
+      "Same deck, same order, every batch, all three cities. It ends with the buddy handover, not with a signature.",
+      "A leader from the function joins for the last fifteen minutes."
+    ],
+    owner:"HR Ops", sla:"Half a day, Day 1, every batch",
+    ai:[
+      "One deck with a recorded voice-over as a fallback, so a batch is never blocked on a presenter's calendar.",
+      "A five-question check after each module confirms it landed, and shows which module needs rewriting."
+    ],
+    stack:"Deck + recording \u00b7 form"
+  },
+  {
+    title:"New joiners don't know who anyone is",
+    who:"All roles", cost:0,
+    problem:"There is no published hierarchy and no contact list. Joiners don't know which team owns what, who sits above their manager, or whom to ask for a laptop, a leave approval or a customer escalation.",
+    example:"An entire batch had nobody to apply to and nobody to go to \u2014 nobody knew who was responsible for which team, or what to ask whom.",
+    system:[
+      "A one-page org map: functions, leaders, reporting lines, all three cities. Refreshed on the first of every month.",
+      "Beside it, a \u201cwho to contact for what\u201d list: IT, payroll, leave, reimbursement, travel, escalation, POSH committee \u2014 with a name, a channel and a response time.",
+      "Both handed over on Day 1 and pinned in the joiner's team channel, so it survives the first week."
+    ],
+    owner:"HR Ops", sla:"Refreshed on the 1st, monthly",
+    ai:[
+      "The org map generates from the HRIS, so it is never hand-drawn and never a month out of date.",
+      "A monthly workflow regenerates it and posts the difference \u2014 joiners, movers, leavers \u2014 to the company channel."
+    ],
+    stack:"HRIS \u00b7 script \u00b7 Slack"
+  },
+  {
+    title:"Leadership stays a name on a slide",
+    who:"All roles", cost:0,
+    problem:"New joiners never meet the people whose decisions shape their work. Leaders are visible in meetings and invisible on the floor, and the gap gets read as indifference.",
+    example:"The room agreed a co-founder walking in to talk to a joining batch would change the whole week \u2014 and noticed that where it hadn't happened, the joiner had felt the absence.",
+    system:[
+      "Fifteen minutes of every induction is a leader, on a rotating roster published a month ahead so it isn't a favour asked on the morning.",
+      "A monthly floor walk in each city: no agenda, no slides, leadership talking to people at their desks.",
+      "The same leaders introduce themselves again at the first town hall, so the face repeats and becomes familiar."
+    ],
+    owner:"HR head + leadership", sla:"Every batch; floor walk monthly",
+    ai:[],
+    stack:""
+  },
+  {
+    title:"Nobody can list what they get besides salary",
+    who:"All roles", cost:0,
+    problem:"Insurance, leave, holidays, reimbursements and allowances exist in fragments across old emails and policy files. Employees learn what they're entitled to by asking someone who happened to claim it before.",
+    example:"The question was asked directly in the meeting \u2014 what additional, other than salary, are they getting? \u2014 and nobody could answer it from a document.",
+    system:[
+      "A benefits one-pager: insurance and who's covered, leave types and counts, the holiday calendar by city, reimbursements and limits, learning budget, referral bonus, statutory items.",
+      "Once a year, the rupee value of the whole package shown alongside CTC. What is given should be what is seen.",
+      "Any change to a benefit announced once, in the same place, with an effective date."
+    ],
+    owner:"HR Ops + Finance", sla:"One-pager in 2 weeks; annual refresh",
+    ai:[
+      "Assemble a first draft from the existing policy files and the payroll structure into one plain-language sheet.",
+      "An internal FAQ bot answers \u201chow many casual leaves do I have\u201d from that same sheet, so HR stops being a lookup service."
+    ],
+    stack:"Claude \u00b7 policy docs \u00b7 FAQ bot"
+  },
+  {
+    title:"POSH and safety are assumed, not covered",
+    who:"All roles", cost:0,
+    problem:"The prevention-of-sexual-harassment policy, the committee members and the escalation route are not part of induction. This is a legal obligation with a statutory committee behind it, not an engagement nice-to-have.",
+    example:"It surfaced late in the discussion as a point to add \u2014 POSH, women's safety, workplace safety \u2014 and was correctly placed inside induction rather than left as an annual email.",
+    system:[
+      "A dedicated module in every induction: what the policy covers, the committee members by name and contact, how a complaint is raised, confidentiality and timelines.",
+      "An annual refresher for everyone, mandatory, with attendance recorded and reportable.",
+      "Committee contacts printed on the same page as the who-to-contact list. Office safety instructions per city: fire, first aid, transport, late-hours policy."
+    ],
+    owner:"HR head + committee members", sla:"Every induction; annual refresher",
+    ai:[
+      "Attendance and refresher tracking automated, with reminders and a compliance report ready when it's asked for.",
+      "The content itself stays human-delivered \u2014 this is not a video people click through."
+    ],
+    stack:"n8n \u00b7 HRIS record"
+  }
+]},
+{
+  id:"first90", n:"3", title:"First 90 days", sub:"Week 1 \u2192 confirmation",
+  desc:"The period that decides whether the hire worked. Almost everything here already half-exists \u2014 it just isn't written, assigned or scheduled.",
+  cards:[
+  {
+    title:"There is no 30/60/90 plan for any role",
+    who:"Sales first, then all", cost:0,
+    problem:"The first three months are improvised by whoever is available. For sales there is an informal shape, but it isn't written, isn't the same for two joiners, and doesn't exist at all for other functions. The joiner has no way of knowing whether they're on track.",
+    example:"The shape described in the room: week one is training, week two is live demo calls, week three is on the floor taking calls with a peer alongside. All of it real, none of it on paper, and nothing equivalent for any other function.",
+    system:[
+      "Every hiring manager submits a 30/60/90 plan with the requisition. No plan, no joining date \u2014 that's the only enforcement that works.",
+      "One fixed shape: what they learn, what they do with help, what they own alone, and how each month is measured.",
+      "Handed to the joiner on Day 1 and used as the agenda for the Day-30, 60 and 90 conversations.",
+      "Sales gets documented first because it already half exists, then one per function."
+    ],
+    owner:"Hiring manager \u00b7 HRBP checks", sla:"Plan with requisition; reviewed at 30/60/90",
+    ai:[
+      "The manager's rough bullets turned into the standard format in minutes, so writing the plan takes fifteen minutes rather than being skipped.",
+      "A library of approved plans per role, reused for the next hire in that role instead of rewritten."
+    ],
+    stack:"Claude \u00b7 shared template"
+  },
+  {
+    title:"The buddy is an idea, not a role",
+    who:"All roles", cost:0,
+    problem:"No buddy is assigned, so a new joiner's questions go to a busy manager or don't get asked. The small things nobody documents \u2014 where to eat, how to raise a ticket, who actually decides \u2014 have no route.",
+    example:"The room agreed on assigning a buddy and then disagreed for several minutes about whether it lasts a week, a month or two months. That disagreement is the definition of a role with no definition.",
+    system:[
+      "A buddy assigned before Day 1, from the same team but never the manager, and named in the pre-joining note.",
+      "Duration: until confirmation at the end of probation. Not a week.",
+      "The job, in five lines: eat lunch together in week 1, answer anything, check in weekly, flag to HR if something's wrong. Not training and not assessment.",
+      "Being a buddy counts in the buddy's own review, and is recognised at the joiner's confirmation."
+    ],
+    owner:"Manager assigns \u00b7 HRBP tracks", sla:"Assigned by Day-3, active until confirmation",
+    ai:[
+      "Pairing suggested by team, location and current workload, so the same helpful person isn't buddy to four people at once.",
+      "A weekly nudge to the buddy for the first month with a one-tap \u201call good / needs attention\u201d reply that reaches the HRBP."
+    ],
+    stack:"n8n \u00b7 Slack/WhatsApp"
+  },
+  {
+    title:"Nobody calls to ask how it's going",
+    who:"All roles", cost:0,
+    problem:"Once the joiner is placed, contact stops. The recruiter has moved to the next role, the HRBP has never met them, and the manager is watching output. A small problem in week one becomes a resignation in month three.",
+    example:"The line that ended the longest argument in the meeting: the recruiter is the first person this joiner ever spoke to at this company, and a two-minute call at one week lands differently from an HR form \u2014 especially when the joiner is in one city and the recruiter is in another.",
+    system:[
+      "Two informal calls from the recruiter, week 1 and week 4. Two minutes, no form, no notes taken in front of them.",
+      "Formal HRBP check-ins at Day 15, 45 and 90, with a short written record and actions.",
+      "Everything raised in either goes into one tracker with an owner and a date. A check-in that produces no action won't get an honest answer the next time."
+    ],
+    owner:"Recruiter (informal) \u00b7 HRBP (formal)", sla:"Week 1 and 4; Day 15, 45, 90",
+    ai:[
+      "Both sets scheduled automatically from the joining date, so neither depends on anyone remembering.",
+      "A three-question pulse before the Day-45 check-in, so the HRBP walks in already knowing where to push."
+    ],
+    stack:"n8n \u00b7 calendar \u00b7 pulse form"
+  },
+  {
+    title:"There's no reason for the team to know them as a person",
+    who:"All roles", cost:1,
+    problem:"New joiners meet their team as colleagues in meetings and never outside them. Rapport is left to chance and to whoever happens to be naturally friendly that week.",
+    example:"A batch was taken out on their second day and the difference was obvious afterwards \u2014 they had connected with everything that was discussed. It worked, and then it didn't become a rule.",
+    system:[
+      "A team lunch or outing in the first week of every joining batch, paid by the company, with the manager present.",
+      "One cross-team coffee in the first month: the joiner meets someone from a function they'll depend on but don't report into.",
+      "A per-head budget agreed once a year, so nobody has to ask permission each time and quietly skip it instead."
+    ],
+    owner:"Manager + HR Ops", sla:"Outing in week 1; coffee in month 1",
+    ai:[],
+    stack:""
+  },
+  {
+    title:"Probation ends by silence",
+    who:"All roles", cost:0,
+    problem:"Confirmation happens because ninety days passed, not because anything was assessed. People doing well are never told, and people struggling find out too late for anyone to help.",
+    example:"Probation came up in the meeting only as the boundary for how long a buddy should stay. The review itself was never mentioned \u2014 which is an accurate reflection of how it currently works.",
+    system:[
+      "A confirmation review against the 30/60/90 plan, held in week 12, not in week 14 after the date has passed.",
+      "Three outcomes only: confirm, extend with a written plan and a date, or exit with notice. The manager recommends, the HRBP signs.",
+      "The confirmation letter goes out within three days, alongside the first growth conversation about what the next level looks like."
+    ],
+    owner:"Manager + HRBP", sla:"Review in week 12; letter within 3 days",
+    ai:[
+      "Scheduled automatically at Day-75 with the 30/60/90 plan and the check-in notes attached to the invite.",
+      "Escalation if the review hasn't happened by Day-85, because a silent probation is the failure mode."
+    ],
+    stack:"n8n \u00b7 HRIS"
+  },
+  {
+    title:"We want joiners to post about us, but we can't ask them to",
+    who:"All roles", cost:0,
+    problem:"A new joiner's post is the most credible employer branding a company can get, and the moment it is requested it stops being credible. Right now there is neither a reason to post nor a rule against asking.",
+    example:"The room reached the right conclusion on its own: don't ask them on day one, because then it looks like we asked them to. Make it something they want to do.",
+    system:[
+      "Make the week worth posting about \u2014 the kit, a real induction, an outing, a leader who showed up \u2014 and then say nothing.",
+      "Give them the raw material without a request: batch photos, the brand kit, the page to tag if they want it.",
+      "Show rather than ask: point new joiners to a previous joiner's post as an example of what's possible, never as a template to copy.",
+      "A hard rule in the ownership map: no recruiter or manager asks a joiner to post. Ever."
+    ],
+    owner:"HR Ops + Marketing", sla:"Photos shared within 48 h of the batch",
+    ai:[
+      "Batch photos and a caption-free asset folder shared automatically after induction.",
+      "Monthly social listening so the company can respond warmly to posts that happen, instead of soliciting the ones that don't."
+    ],
+    stack:"n8n \u00b7 drive \u00b7 social listening"
+  }
+]},
+{
+  id:"life", n:"4", title:"Life in the company", sub:"Every month, all year",
+  desc:"What keeps someone here after the novelty wears off. All of this exists as good intentions today, which is another way of saying it doesn't exist.",
+  cards:[
+  {
+    title:"Engagement is whatever someone remembers to organise",
+    who:"All locations", cost:1,
+    problem:"Activities happen when somebody has spare time and stop when they don't. Naming it after the fun also makes it easy for the business to decline, because it sounds like a games hour rather than a retention cost.",
+    example:"The room spent several minutes on the name and landed on the right answer: call it employee engagement, because that's the umbrella leadership will fund. Fun Fridays sit inside it, along with festivals, birthdays and anniversaries.",
+    system:[
+      "One engagement charter with a fixed cadence: something light every week, something bigger every month, festivals and cultural days per the calendar, birthdays and work anniversaries marked monthly.",
+      "Published a month ahead, identical in all three cities, with a per-head budget approved once a year.",
+      "The business rationale written on the charter in one line, so the plan doesn't have to be re-argued every quarter: engaged people don't leave in month four."
+    ],
+    owner:"HR Ops + city anchors", sla:"Calendar monthly; something every week",
+    ai:[
+      "A rotating idea bank per month per city, with cost and time per activity, so nobody plans from a blank page at 6 pm on Thursday.",
+      "Birthday and anniversary posts scheduled automatically, with a nudge to the manager the day before."
+    ],
+    stack:"Claude \u00b7 Slack/WhatsApp \u00b7 sheet"
+  },
+  {
+    title:"Good work goes unnoticed until appraisal",
+    who:"All roles", cost:1,
+    problem:"There is no recognition programme, so the only formal signal that someone did well arrives once a year, attached to money. Everything in between depends on whether their manager is the type to say it.",
+    example:"Recognition was the very first thing named when the room was asked what makes someone want to stay.",
+    system:[
+      "Monthly recognition per function \u2014 one or two names, a stated reason, announced in the town hall and the newsletter.",
+      "Peer nominations open to everyone, one click, reason in the nominator's own words.",
+      "Small and consistent beats large and rare: a voucher, a note from a leader, and the name said out loud in front of the company."
+    ],
+    owner:"HRBP + function heads", sla:"Monthly, announced by the 5th",
+    ai:[
+      "Nominations feed a sheet; the citation copy for the announcement and newsletter is drafted from the nominator's reason.",
+      "Names and decisions stay entirely human \u2014 the drafting is the only part worth automating."
+    ],
+    stack:"form \u00b7 sheet \u00b7 Claude"
+  },
+  {
+    title:"Gifting happens if someone thinks of it",
+    who:"All locations", cost:2,
+    problem:"Diwali, New Year, joining kits and milestones are handled case by case, so some people get something and some don't, the spend is unplanned, and the last-minute version is always more expensive.",
+    example:"The room drew the right distinction and then left it there: recognition is for performance, gifting is for occasions, and both were missing.",
+    system:[
+      "A gifting calendar for the year: welcome kit on Day 1, one major festival, New Year, work anniversary, and a farewell gift at exit.",
+      "Same item and same value in all three cities, shipped to the home addresses collected in the onboarding form.",
+      "One vendor, one annual budget line, ordered a month ahead."
+    ],
+    owner:"HR Ops + Admin", sla:"Ordered 30 days before each occasion",
+    ai:[
+      "One sheet drives the address list, the order and the courier tracking.",
+      "Reminders 45 days out, so procurement never happens in the final week at a premium."
+    ],
+    stack:"sheet \u00b7 n8n"
+  },
+  {
+    title:"The internal mail is boring, so nobody reads it",
+    who:"All roles", cost:1,
+    problem:"There is a daily internal email that people have stopped opening. Announcements go out and nothing else does, so employees hear about the company's wins from customers rather than from the company.",
+    example:"Said plainly about the current 10 am mail: it's boring. The fix arrived in the same breath \u2014 jokes, fun facts, what happened on this day, what the company has actually shipped.",
+    system:[
+      "A weekly internal newsletter with a fixed shape: what shipped, what we won, new courses and content added, joiners and movers, recognition, one fun item, one thing you can do this week.",
+      "The same content adapted for the customer newsletter, so it's written once and used twice.",
+      "The daily mail keeps only what is genuinely daily. Everything else moves to the weekly."
+    ],
+    owner:"HR Ops + Marketing", sla:"Same day, same time, every week",
+    ai:[
+      "The draft assembles itself from the week's channels, release notes, course additions and HRIS changes. A human edits and sends.",
+      "This is the only reason a weekly newsletter survives past month two \u2014 it has to take minutes, not an afternoon."
+    ],
+    stack:"Claude \u00b7 n8n \u00b7 email tool"
+  },
+  {
+    title:"Town halls and the offsite aren't planned until they're late",
+    who:"All locations", cost:2,
+    problem:"Company-wide moments get discussed close to the date and then cut for cost or logistics. With three cities, that failure is now three times as visible and three times as expensive to fix late.",
+    example:"The September anniversary came up with no plan, no format and no decision on how three cities would be handled.",
+    system:[
+      "A monthly town hall: business update, HR update, recognition, and questions collected in advance. Same session for all cities, recorded for anyone who missed it.",
+      "One offsite a year with a stated output, planned ninety days ahead. It is an engagement moment and a working session, not a holiday.",
+      "The anniversary treated as a fixed annual event with a locked budget, rather than a fresh argument each year."
+    ],
+    owner:"HR head + leadership", sla:"Town hall monthly; offsite planned 90 days ahead",
+    ai:[
+      "Anonymous questions collected beforehand, clustered and ranked, so leadership answers what people actually asked rather than what's comfortable.",
+      "The recording transcribed and summarised for anyone who couldn't attend."
+    ],
+    stack:"form \u00b7 Claude \u00b7 recording"
+  },
+  {
+    title:"Teams don't talk to each other until something breaks",
+    who:"All functions", cost:0,
+    problem:"Functions and cities operate as separate organisations. Decisions taken in one place surprise the others, and there is no forum where a dependency gets raised before it becomes an escalation.",
+    example:"Named in the room as one of the most important things missing: cross-functional discussion, org-wide decisions and org-wide culture, across all locations rather than per office.",
+    system:[
+      "A monthly cross-functional forum: one representative per function, standing agenda of dependencies, blockers and what changes next month.",
+      "Every org-wide policy change goes through it before announcement, so no function hears about it first in a company email.",
+      "Notes published to everyone within 24 hours, including the decisions that were not taken and why."
+    ],
+    owner:"HR head + function heads", sla:"Monthly; notes within 24 h",
+    ai:[
+      "The transcript turned into structured notes \u2014 decisions, owners, dates \u2014 and posted automatically.",
+      "Open items carried into the next agenda, so nothing depends on someone remembering last month."
+    ],
+    stack:"transcript \u00b7 Claude \u00b7 shared doc"
+  }
+]},
+{
+  id:"growth", n:"5", title:"Growth and voice", sub:"Ongoing",
+  desc:"The four mechanisms that tell you how someone is doing before their resignation does.",
+  cards:[
+  {
+    title:"One-on-ones don't happen",
+    who:"Managers", cost:0,
+    problem:"There is no monthly conversation between a manager and each of their people, so problems surface either in an appraisal or in a resignation \u2014 both too late to act on.",
+    example:"The standard was stated correctly in the meeting: every manager should have a one-on-one with each teammate, every month. It is not happening anywhere.",
+    system:[
+      "A recurring thirty minutes per person, per month, on the manager's calendar. Employee-led agenda, three standing questions: what's working, what's blocked, what do you want next.",
+      "The manager writes three lines afterwards in a shared note the employee can see, so nothing said in the room gets remembered differently later.",
+      "HR sees completion only, never content. A manager who skips two months running is a manager problem, not an employee problem."
+    ],
+    owner:"Reporting manager", sla:"Monthly, 30 minutes per person",
+    ai:[
+      "Completion tracked from calendar data alone, with a monthly list to function heads. No reading of anything private.",
+      "Prompt questions sent to the employee the day before, so the half hour isn't spent working out what to say."
+    ],
+    stack:"calendar API \u00b7 sheet"
+  },
+  {
+    title:"Feedback is collected informally or not at all",
+    who:"All roles", cost:1,
+    problem:"An informal check-in tells you how someone feels today. It doesn't tell you what needs to change, and it collects nothing from the manager's side. Both instruments are missing.",
+    example:"The distinction was drawn clearly in the room: the informal \u201chow's it going\u201d and the formal \u201cwhat do you want changed\u201d are two different things, and only the informal one exists.",
+    system:[
+      "A structured feedback round twice a year for everyone: role, manager, team, tools, growth, and one open question on what should change.",
+      "The same cycle collects the manager's feedback on their team and on HR, so it runs in both directions.",
+      "Results go back to the company at the next town hall with three things being changed and three that aren't, with reasons. Feedback with no visible outcome kills the next round."
+    ],
+    owner:"HRBP", sla:"Twice yearly; results published within 30 days",
+    ai:[
+      "Free-text responses clustered into themes, ranked by frequency, with representative quotes preserved and identity stripped before anyone reads them.",
+      "Turns two weeks of reading into an afternoon, which is the difference between doing this twice a year and doing it once and stopping."
+    ],
+    stack:"form \u00b7 Claude \u00b7 dashboard"
+  },
+  {
+    title:"There's no growth path to point at",
+    who:"All roles", cost:0,
+    problem:"Nobody can tell an employee what the next role is, what it takes, or when it's reviewed. The most common reason a good performer starts looking elsewhere is that they can't see the next step from where they're standing.",
+    example:"Development and growth was called the main point of the whole employee-experience section, and then stayed as two words on the board while the conversation moved on.",
+    system:[
+      "A published band and role map per function: what each level owns, what it takes to reach the next one, and when it gets reviewed.",
+      "A one-page development plan per employee, revisited mid-year: one skill, one project, one measure.",
+      "A learning budget with a stated amount and a two-line approval, and internal courses listed in the newsletter as they're added."
+    ],
+    owner:"Function heads + HRBP", sla:"Map in 6 weeks; plans at mid-year",
+    ai:[
+      "A first-draft development plan generated from the role map and the last review for the manager to edit.",
+      "Internal course recommendations matched to the specific gap named in the plan, rather than a catalogue nobody browses."
+    ],
+    stack:"Claude \u00b7 role map sheet"
+  },
+  {
+    title:"The first sign of attrition is the resignation letter",
+    who:"Managers + HRBP", cost:0,
+    problem:"By the time someone resigns the decision is weeks old and usually irreversible. Nothing currently watches for the signals that arrive well before it.",
+    example:"The exit discussion in the meeting began at the moment an employee announces they're leaving \u2014 which is already past the point where anything can be done except negotiate.",
+    system:[
+      "A quarterly review per team: HRBP and manager go name by name against known signals \u2014 skipped one-on-ones, no growth conversation in six months, a missed increment, a manager or buddy change, a long stretch without leave.",
+      "Every name marked at risk gets one action, one owner and one date. It is a to-do list, not a watchlist.",
+      "Compare the list against actual exits each quarter to learn which signals are real here and drop the ones that aren't."
+    ],
+    owner:"HRBP + manager", sla:"Quarterly; actions within 2 weeks",
+    ai:[
+      "Signals pulled from HRIS and calendar data \u2014 one-on-one gaps, leave patterns, time since last increment \u2014 into a private HRBP view.",
+      "It prompts a human conversation. It never scores, ranks or flags a person to their manager as a risk."
+    ],
+    stack:"HRIS \u00b7 sheet \u00b7 alerting"
+  }
+]},
+{
+  id:"exit", n:"6", title:"Exit and alumni", sub:"Intimation \u2192 alumni",
+  desc:"The stage everyone treats as an ending. It is the last thing the whole team watches you do, and the cheapest source of referrals and rehires you will ever have.",
+  cards:[
+  {
+    title:"When someone wants to leave, nobody knows what happens next",
+    who:"All roles", cost:0,
+    problem:"The employee tells either their manager or HR. If it's the manager, there is no defined next step, so the information sits, the team hears it informally, and HR finds out last.",
+    example:"The question asked directly in the meeting \u2014 if he goes to the team manager, what should the manager do immediately \u2014 had no answer in the room.",
+    system:[
+      "One rule: however HR hears it, HR hears it within 24 hours. The manager's only job is to listen, commit to nothing, and inform the HRBP.",
+      "A published exit flow: intimation \u2192 HRBP conversation within 48 h \u2192 retention decision \u2192 formal resignation \u2192 notice, KT and last-day plan \u2192 exit interview \u2192 clearance \u2192 farewell \u2192 alumni.",
+      "Because it's published, a manager facing their first resignation doesn't have to invent a process while someone is sitting in front of them."
+    ],
+    owner:"HRBP", sla:"HR informed in 24 h; conversation in 48 h",
+    ai:[
+      "One intake form starts the entire sequence \u2014 tasks, dates and reminders across HR, IT, finance and the manager \u2014 from a single submission."
+    ],
+    stack:"form \u00b7 n8n \u00b7 ticketing"
+  },
+  {
+    title:"Nobody tries to keep them",
+    who:"All roles", cost:0,
+    problem:"There is no conversation between \u201cI want to leave\u201d and \u201chere's my notice.\u201d Sometimes the reason is fixable \u2014 a manager, a shift, a project, a title \u2014 and the company never finds out because the first conversation is about paperwork.",
+    example:"The room put \u201cengagement after intimation\u201d on the board and moved on before deciding who does it or what it contains.",
+    system:[
+      "The HRBP holds a retention conversation within 48 hours, before the resignation is formalised: the reason, what would change it, and what the company can honestly offer.",
+      "Counter-offers only within band and only with the function head's approval. An out-of-band counter buys three months and breaks parity for everyone else.",
+      "Reasons logged, categorised and reviewed quarterly against the engagement and growth plans. The same reason three times is a system problem, not three people."
+    ],
+    owner:"HRBP + function head", sla:"Within 48 h of intimation",
+    ai:[
+      "Reasons categorised and trended automatically, giving a quarterly view of why people actually leave, by team and by tenure.",
+      "That view is what tells you which stage on this page to fix next."
+    ],
+    stack:"sheet \u00b7 Claude"
+  },
+  {
+    title:"The exit interview is a formality",
+    who:"All roles", cost:0,
+    problem:"Exit interviews either don't happen or happen as a form nobody reads afterwards. The most honest feedback a company will ever receive is collected and then filed.",
+    example:"The instruction given in the room was exactly right \u2014 pull the points out and sort what's valid from what isn't \u2014 and it is precisely what nobody does today.",
+    system:[
+      "Two conversations: one with the manager or function, one with HR. HR's happens after the settlement is agreed, because that's when the answers get honest.",
+      "Fixed questions: why you're leaving, what would have kept you, the manager, the role, the team, and one thing to fix.",
+      "HR sorts every point into valid and not valid, and the valid ones get a named owner. Themes go to leadership quarterly, anonymised."
+    ],
+    owner:"HRBP", sla:"Both before the last working day; themes quarterly",
+    ai:[
+      "The conversation or form summarised into themes and matched against the retention-reason log.",
+      "Recurring causes become visible without anyone re-reading a year of exit forms to find them."
+    ],
+    stack:"Claude \u00b7 sheet"
+  },
+  {
+    title:"Knowledge transfer starts too late and has no format",
+    who:"All roles", cost:0,
+    problem:"KT gets squeezed into the notice period and shaped entirely by the person leaving. What actually transfers depends on how conscientious someone feels in their final week.",
+    example:"When the question came up of when KT happens, the answer was \u201cnotice period only\u201d \u2014 and the room immediately agreed that was too late and had to be crossed off differently.",
+    system:[
+      "One KT format for the whole company: live handovers, accounts and customers, in-flight work, credentials and access, files and where they live, recurring commitments, known risks. Functions fill it their own way; the headings don't change.",
+      "KT starts in week one of notice and is signed off by the person receiving it, not the person leaving.",
+      "Documentation is continuous, not terminal: every role keeps a live handover doc updated quarterly, so a sudden exit costs days instead of months."
+    ],
+    owner:"Manager \u00b7 HRBP tracks", sla:"Signed off 5 working days before the last day",
+    ai:[
+      "The template pre-filled from the person's own systems \u2014 calendar ownership, ticket queues, shared documents \u2014 so they edit a draft instead of recalling everything under pressure."
+    ],
+    stack:"template \u00b7 n8n \u00b7 Claude"
+  },
+  {
+    title:"Clearance and settlement drag",
+    who:"All roles", cost:0,
+    problem:"Assets, access, dues and the final settlement get chased after the person has already gone, which is when they are hardest to resolve and when whatever goodwill remained gets spent.",
+    example:"Not raised in the discussion. It's the part of exit that only becomes visible when it goes wrong \u2014 which is a good reason to write it down before it does.",
+    system:[
+      "A clearance checklist opened at resignation, not on the last day: IT assets and access, finance dues, credentials, handover sign-off.",
+      "Relieving and experience letters issued on the last working day. Full and final within a stated window, published in the policy so nobody has to ask twice.",
+      "Access revoked on the last day, at the hour, by IT, with a written record."
+    ],
+    owner:"HR Ops \u00b7 IT \u00b7 Finance", sla:"Letters on the last day; F&F within the stated window",
+    ai:[
+      "The checklist and its due dates generate at resignation; overdue items escalate to the owner's manager.",
+      "Standard letters generated from the HRIS record rather than retyped each time."
+    ],
+    stack:"n8n \u00b7 HRIS \u00b7 ticketing"
+  },
+  {
+    title:"People leave without a goodbye",
+    who:"All roles", cost:1,
+    problem:"Someone gives the company years and finishes on a Friday with nobody saying anything. The team watching learns something from that, and it isn't a good lesson.",
+    example:"The room settled this one quickly: not a full party for everyone, but a proper farewell \u2014 a cake, a small gift, and a thank-you for what they contributed.",
+    system:[
+      "Every exit in good standing gets a farewell: a team gathering on the last day, a small gift, and a thank-you from the manager naming what this person actually contributed.",
+      "The manager speaks. It's fifteen minutes and it belongs to the person leaving.",
+      "Scale it, don't skip it: a team farewell for everyone, something larger for long tenures."
+    ],
+    owner:"Manager + HR Ops", sla:"On the last working day",
+    ai:[],
+    stack:""
+  },
+  {
+    title:"Ex-employees disappear",
+    who:"Alumni", cost:0,
+    problem:"Former employees are the cheapest source of referrals, rehires and credible employer branding, and today the relationship ends at the door.",
+    example:"The plan named in the meeting: keep them in a group, stay in touch, message them periodically to ask how they're doing. It just needs an owner and a cadence.",
+    system:[
+      "An alumni group joined at exit, with consent, and a stated purpose: openings, referrals, company news, and an invitation to the annual event.",
+      "A written rehire policy: who is eligible, what the exit record must say, who approves. Boomerang hires are the cheapest good hires available.",
+      "One personal message at three months and a note on the work anniversary. A relationship, not a mailing list."
+    ],
+    owner:"HRBP", sla:"Invite at exit; touch at 3 months, then annually",
+    ai:[
+      "The alumni list maintained automatically from exits where consent was given.",
+      "Openings matching a former employee's role surfaced to the recruiter before the role is posted externally."
+    ],
+    stack:"sheet \u00b7 n8n \u00b7 ATS"
+  }
+]}
+];
+
+const TRACKS = [
+  {id:"ta", label:"Talent acquisition", rail:"rail-ta", stages:TA_STAGES},
+  {id:"hr", label:"HR operations",      rail:"rail-hr", stages:HR_STAGES}
+];
+
+const COST = {0:["cost0","\u20b90 \u00b7 discipline only"],1:["cost1","Low \u00b7 small budget"],2:["cost2","Paid \u00b7 plan the spend"]};
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function li(arr){return arr.map(x=>`<li>${esc(x)}</li>`).join("")}
+
+function card(c,sid,i){
+  const [cc,cl]=COST[c.cost];
+  const aiCol = c.ai.length
+    ? `<ul>${li(c.ai)}</ul>${c.stack?`<div class="stack">Stack: <code>${esc(c.stack)}</code></div>`:""}`
+    : `<p class="none">Deliberately none. This is where people win.</p>`;
+  return `<article class="card" id="${sid}-${i}" data-cost="${c.cost}">
+    <div class="card-h"><h3>${esc(c.title)}</h3>
+      <div class="tags"><span class="tag">${esc(c.who)}</span><span class="tag ${cc}">${cl}</span></div></div>
+    <div class="tri">
+      <div class="col pr"><h4>Problem</h4><p>${esc(c.problem)}</p><div class="ex"><b>From the discussion</b>${esc(c.example)}</div></div>
+      <div class="col sy"><h4>System</h4><ol>${li(c.system)}</ol><div class="meta"><span>Owner: <b>${esc(c.owner)}</b></span><span>SLA: <b>${esc(c.sla)}</b></span></div></div>
+      <div class="col ai"><h4>AI layer</h4>${aiCol}</div>
+    </div></article>`;
+}
+
+const main=document.getElementById("stages");
+TRACKS.forEach(t=>{
+  const rail=document.getElementById(t.rail);
+  t.stages.forEach(s=>{
+    const sid=`${t.id}-${s.id}`;
+    main.insertAdjacentHTML("beforeend",`<section class="stage" data-trk="${t.id}" id="${sid}"><header><div class="n">${s.n}</div><div><h2>${esc(s.title)}</h2><p>${esc(s.desc)}</p></div></header>${s.cards.map((c,i)=>card(c,sid,i)).join("")}</section>`);
+    rail.insertAdjacentHTML("beforeend",`<li><button data-target="${sid}"><b>${s.n}. ${esc(s.title)}</b><small>${esc(s.sub)} \u00b7 ${s.cards.length} problems</small></button></li>`);
+  });
+});
+
+// Rail nav + current stage
+document.querySelectorAll(".rail ol").forEach(r=>r.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  document.getElementById(b.dataset.target).scrollIntoView({block:"start"});
+}));
+const railBtns=[...document.querySelectorAll(".rail ol button")];
+const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){railBtns.forEach(b=>b.classList.toggle("cur",b.dataset.target===en.target.id))}})},{rootMargin:"-20% 0px -70% 0px"});
+document.querySelectorAll("section.stage").forEach(s=>io.observe(s));
+
+// Track switch
+let track="ta";
+function setTrack(id){
+  track=id;
+  document.body.dataset.track=id;
+  document.querySelectorAll(".tracks button").forEach(b=>b.classList.toggle("on",b.dataset.track===id));
+  document.querySelectorAll(".jcard").forEach(b=>b.classList.toggle("on",b.dataset.track===id));
+  apply();
+}
+function pick(b){
+  const jump = b.classList.contains("jcard");
+  setTrack(b.dataset.track);
+  if(jump) document.querySelector(`section.stage[data-trk="${b.dataset.track}"]`).scrollIntoView({block:"start"});
+}
+document.querySelectorAll(".tracks button, .jcard").forEach(b=>{
+  b.addEventListener("click",()=>pick(b));
+  b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(b)}});
+});
+
+// Lens
+document.querySelectorAll(".lens button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".lens button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  document.body.dataset.lens=b.dataset.lens;
+}));
+
+// Cost filter + search
+let cost="all", q="";
+function apply(){
+  let shown=0,total=0;
+  document.querySelectorAll("section.stage").forEach(s=>{
+    const inTrack = s.dataset.trk===track;
+    s.querySelectorAll(".card").forEach(c=>{
+      if(inTrack) total++;
+      const okCost = cost==="all" || c.dataset.cost===cost;
+      const okQ = !q || c.textContent.toLowerCase().includes(q);
+      const ok=okCost&&okQ; c.classList.toggle("hide",!ok); if(ok&&inTrack)shown++;
+    });
+    s.style.display = (inTrack && s.querySelector(".card:not(.hide)")) ? "" : "none";
+  });
+  document.getElementById("count").textContent=`${shown} of ${total} problems shown`;
+}
+document.querySelectorAll(".costf button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".costf button").forEach(x=>x.classList.remove("on"));b.classList.add("on");cost=b.dataset.cost;apply();
+}));
+document.getElementById("search").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();apply()});
+setTrack("ta");
+</script>
+</body>
+</html>
